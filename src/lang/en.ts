@@ -53,14 +53,14 @@ export const en: Translation = {
   who_i_am_text1:
     "Hi there! I'm Nhywyll, your friendly neighborhood VTuber and streamer with an unending love for all things modded Minecraft. My livestreams are a gateway to a world of limitless creativity and exhilarating adventures that this pixelated universe has to offer.",
   who_i_am_text2:
-    "Whether I'm diving into the art of crafting intricate structures or embarking on thrilling quests (currently Stoneblock 4!), there's always a new journey to share. Join me in this ever-evolving adventure as we explore, create, and have an absolute blast together! 🚀💚",
+    "Whether I'm diving into the art of crafting intricate structures or embarking on thrilling quests (currently NeoTech!), there's always a new journey to share. Join me in this ever-evolving adventure as we explore, create, and have an absolute blast together! 🚀💚",
   faq_title: "Frequently Asked Questions",
   faq_q1: "What are your pronouns?",
   faq_a1: "They/them",
   faq_q2: "What is your favorite chicken breed?",
   faq_a2: "Silkies! :D",
   faq_q3: "What modpack are you playing currently?",
-  faq_a3: "Stoneblock 4 by FTB (Feed the Beast)",
+  faq_a3: "NeoTech by FTB (Feed the Beast)",
   faq_q4: "Where are you from?",
   faq_a4: "Germany / native German speaker.",
   stats_title: "Streaming Stats",
