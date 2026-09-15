@@ -198,20 +198,6 @@ function init() {
   }
 }
 
-// Ensure the DOM is ready before running scripts
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
-
-// Global verfügbar machen für Notfälle
-(window as any).setLanguage = (lang: string) => {
-  currentLanguage = lang;
-  localStorage.setItem("language", lang);
-  updateTexts();
-};
-
 // --- Scroll Effects (Progress Bar & Back-to-Top) ---
 function setupScrollEffects() {
   // Progress Bar Element erstellen
@@ -749,3 +735,22 @@ async function checkTwitchLiveStatus() {
     console.error("Error checking Twitch live status:", error);
   }
 }
+
+// --- Start ---
+// Muss am Dateiende stehen: init() läuft als Modul oft sofort (readyState "interactive").
+// Stünde der Aufruf weiter oben, wären die weiter unten deklarierten Konstanten
+// (z. B. isProduction für die Analytics) noch nicht belegt -> "y is not a function",
+// init() bricht ab und die Seite zeigt nur Übersetzungs-Schlüssel (Bug 2026-09-06 bis 09-15,
+// betraf alle Besucher mit Cookie-Zustimmung „Alle akzeptieren").
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+
+// Global verfügbar machen für Notfälle
+(window as any).setLanguage = (lang: string) => {
+  currentLanguage = lang;
+  localStorage.setItem("language", lang);
+  updateTexts();
+};
