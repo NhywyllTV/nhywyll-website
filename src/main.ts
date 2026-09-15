@@ -559,7 +559,6 @@ document.addEventListener("click", (e) => {
 const PROD_HOSTNAME = "nhywyll.com";
 const GA_ID_PROD = "G-8NZ8JX48ZP";
 const GA_ID_TEST = "G-R18WRP31XQ";
-const METRICOOL_HASH = "8d9a03967f7bdb8481d6ec6f0c9bd793";
 
 const isProduction = () => window.location.hostname === PROD_HOSTNAME;
 
@@ -581,22 +580,6 @@ function initAnalytics() {
         gtag('config', '${gaId}');
     `;
   document.head.appendChild(script2);
-
-  // Metricool kennt nur eine Marke, daher ausschliesslich auf der Live-Domain
-  // laden - sonst verfaelschen Test-Zugriffe die Statistik.
-  if (!isProduction()) return;
-
-  const metricool = document.createElement("script");
-  metricool.async = true;
-  metricool.src = "https://tracker.metricool.com/resources/be.js";
-  metricool.onload = () => {
-    (
-      window as unknown as {
-        beTracker?: { t: (o: { hash: string }) => void };
-      }
-    ).beTracker?.t({ hash: METRICOOL_HASH });
-  };
-  document.head.appendChild(metricool);
 }
 
 // --- FAQ Accordion ---
