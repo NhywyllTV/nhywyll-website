@@ -1717,7 +1717,7 @@ footer {
     height: 100vh;
     width: 100%;
     max-width: 100%;
-    background: #0a0a1f; /* Solid background for mobile menu */
+    background: var(--bg-primary); /* Deckend, aber theme-abhaengig: #0a0a1f blieb im Light-Theme dunkel */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     z-index: var(--z-menu);
@@ -1920,6 +1920,9 @@ footer {
 /* Partner title */
 .partner-title {
   margin-top: 2rem;
+  /* War ein <h1> und ist jetzt ein <h2> (eine Seite, eine H1).
+     Groesse bleibt wie zuvor, damit sich das Layout nicht aendert. */
+  font-size: 2rem;
 }
 
 .partner-section {
@@ -1971,6 +1974,10 @@ footer {
     font-weight: 600;
     font-size: 1.1rem;
     margin-top: 0.5rem;
+
+    .light-theme & {
+      color: #b45309; /* Gold erreicht auf heller Karte nur 1.26:1 */
+    }
   }
 }
 
@@ -2299,6 +2306,11 @@ footer {
   font-weight: 600;
   font-size: 1rem;
   animation: fadeInUp 0.4s ease forwards;
+}
+
+/* Das helle Gruen erreicht auf dem hellen Tint nur 2.28:1 */
+.light-theme .contact-success-msg {
+  color: #166534;
 }
 
 /* === Emote Integration === */
