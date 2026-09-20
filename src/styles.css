@@ -1976,7 +1976,7 @@ footer {
     margin-top: 0.5rem;
 
     .light-theme & {
-      color: #b45309; /* Gold erreicht auf heller Karte nur 1.26:1 */
+      color: #92400e; /* Gold erreicht auf heller Karte nur 1.26:1; #b45309 blieb mit 4.38:1 knapp darunter */
     }
   }
 }
