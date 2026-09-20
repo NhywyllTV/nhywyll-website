@@ -104,7 +104,17 @@ function setupLanguageSwitcher() {
   // Dropdown öffnen/schließen
   currentBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    switcher.classList.toggle("open");
+    const isOpen = switcher.classList.toggle("open");
+    currentBtn.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  // Dropdown per Escape schliessen und Fokus zurueckgeben
+  switcher.addEventListener("keydown", (e) => {
+    if ((e as KeyboardEvent).key === "Escape" && switcher.classList.contains("open")) {
+      switcher.classList.remove("open");
+      currentBtn.setAttribute("aria-expanded", "false");
+      (currentBtn as HTMLElement).focus();
+    }
   });
 
   // Sprache wählen
@@ -117,12 +127,14 @@ function setupLanguageSwitcher() {
         updateTexts();
       }
       switcher.classList.remove("open");
+      currentBtn.setAttribute("aria-expanded", "false");
     });
   });
 
   // Schließen wenn man außerhalb klickt
   document.addEventListener("click", () => {
     switcher.classList.remove("open");
+    currentBtn.setAttribute("aria-expanded", "false");
   });
 }
 // 6. Mobile Menü Logik
@@ -659,14 +671,21 @@ function setupContactForm() {
   if (!successMsg) {
     successMsg = document.createElement("p");
     successMsg.className = "contact-success-msg";
+    // Ohne Live-Region erfaehrt ein Screenreader nichts vom Versand (WCAG 4.1.3)
+    successMsg.setAttribute("role", "status");
+    successMsg.setAttribute("aria-live", "polite");
     const submitBtn = form.querySelector('[type="submit"]');
     submitBtn?.insertAdjacentElement("afterend", successMsg);
   }
   const toggleBtns = form.querySelectorAll<HTMLButtonElement>(".toggle-btn");
   toggleBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
-      toggleBtns.forEach((b) => b.classList.remove("active"));
+      toggleBtns.forEach((b) => {
+        b.classList.remove("active");
+        b.setAttribute("aria-pressed", "false");
+      });
       btn.classList.add("active");
+      btn.setAttribute("aria-pressed", "true");
     });
   });
   form.addEventListener("submit", (e) => {
@@ -690,7 +709,10 @@ function setupContactForm() {
       strings?.["contact_success"] ?? "Your mail program has been opened!";
     successMsg.style.display = "block";
     form.reset();
-    toggleBtns.forEach((b, i) => b.classList.toggle("active", i === 0));
+    toggleBtns.forEach((b, i) => {
+      b.classList.toggle("active", i === 0);
+      b.setAttribute("aria-pressed", String(i === 0));
+    });
     setTimeout(() => {
       successMsg.style.display = "none";
     }, 7000);

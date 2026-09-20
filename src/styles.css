@@ -147,7 +147,7 @@ h6,
   --bg-glass: rgba(246, 248, 252, 0.75);
   --text-primary: #2d314e; /* Deep dark slate-navy text matching the logo */
   --text-secondary: #575c82; /* Medium slate-blue text */
-  --text-muted: #8287a9; /* Muted lavender-gray text */
+  --text-muted: #686d8e; /* Muted lavender-gray text (>=4.5:1 auf --bg-primary) */
   --accent-primary: #5c6494; /* Dusty lavender from the logo (darker for readability) */
   --accent-secondary: #0d9488; /* Saturated teal/cyan from the logo stars */
   --accent-glow: rgba(92, 100, 148, 0.2);
@@ -429,8 +429,9 @@ main {
           /* Pronouns badge */
           --badge-color: var(--accent-secondary);
           --badge-glow: rgba(139, 92, 246, 0.45);
-          
+
           .light-theme & {
+            --badge-color: #0f766e; /* Dunkleres Teal fuer >=4.5:1 */
             --badge-glow: rgba(124, 58, 237, 0.25);
           }
         }
@@ -447,7 +448,7 @@ main {
           --badge-glow: rgba(255, 209, 102, 0.45);
           
           .light-theme & {
-            --badge-color: #d97706; /* Darker amber for contrast */
+            --badge-color: #b45309; /* Dunkleres Amber fuer >=4.5:1 */
             --badge-glow: rgba(217, 119, 6, 0.25);
           }
         }
@@ -1621,6 +1622,9 @@ footer {
     color: var(--text-primary);
     text-decoration: underline;
     transition: color 0.3s;
+    display: inline-block;
+    padding-block: 0.25rem;
+    min-height: 24px;
 
     &:hover {
       color: var(--accent-primary);
@@ -2083,6 +2087,11 @@ footer {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background: rgba(0, 0, 0, 0.15);
   opacity: 0;
+}
+
+/* Im Light-Theme wuerde der dunkle Overlay den Textkontrast unter 4.5:1 druecken */
+.light-theme .faq-content {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .faq-card.active {
@@ -2708,7 +2717,7 @@ footer {
   border-radius: 50px;
   text-decoration: none;
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-  color: #ffffff;
+  color: var(--bg-primary);
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 15px var(--accent-glow);
@@ -2718,9 +2727,45 @@ footer {
 .cta-btn:hover {
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 6px 20px var(--accent-glow);
-  color: #ffffff;
+  color: var(--bg-primary);
 }
 
 .discord-icon {
   flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Reduzierte Bewegung (WCAG 2.3.3)
+   Wer im Betriebssystem "Bewegung reduzieren" aktiviert hat, bekommt die
+   Inhalte ohne Animation. Transitions bleiben minimal erhalten, damit
+   Zustandswechsel (z. B. Fokus, FAQ auf/zu) weiterhin nachvollziehbar sind.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Dekorative Dauerschleifen ganz abschalten */
+  .mesh-gradient,
+  .feather,
+  .chicken-runner,
+  [class*="pulse"],
+  [class*="float"] {
+    animation: none !important;
+  }
+
+  /* Einblend-Animationen duerfen den Inhalt nicht verstecken */
+  .entrance-animate {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

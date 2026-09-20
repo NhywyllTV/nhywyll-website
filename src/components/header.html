@@ -22,7 +22,7 @@
         </span>
       </div>
     </a>
-    <ul>
+    <ul id="nav-menu">
       <li><a href="index.html" data-i18n="nav_home">Home</a></li>
       <li><a href="links.html" data-i18n="nav_links">Links</a></li>
       <li><a href="contact.html" data-i18n="nav_contact">Contact</a></li>
@@ -34,11 +34,14 @@
           class="lang-btn current-lang"
           aria-label="Change Language"
           data-i18n-aria-label="aria_label_change_language"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="lang-menu"
         >
           <span class="active-lang"></span>
           <span class="dropdown-arrow">▼</span>
         </button>
-        <div class="lang-menu">
+        <div class="lang-menu" id="lang-menu">
           <button class="lang-opt" data-lang="en">English</button>
           <button class="lang-opt" data-lang="de">Deutsch</button>
         </div>
@@ -59,6 +62,7 @@
         aria-label="Toggle navigation menu"
         data-i18n-aria-label="aria_label_menu_toggle"
         aria-expanded="false"
+        aria-controls="nav-menu"
       >
         <span></span>
         <span></span>
