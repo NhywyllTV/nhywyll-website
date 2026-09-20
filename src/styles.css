@@ -438,8 +438,14 @@ main {
 
         &:nth-child(2) {
           /* Gamer badge */
-          --badge-color: var(--accent-primary);
+          /* Etwas heller als --accent-primary: der mausgesteuerte Glow hellt
+             den Hintergrund auf und drueckt #7d88c4 auf 4.37:1. */
+          --badge-color: #8d97ce;
           --badge-glow: var(--accent-glow);
+
+          .light-theme & {
+            --badge-color: var(--accent-primary);
+          }
         }
 
         &:nth-child(3) {
