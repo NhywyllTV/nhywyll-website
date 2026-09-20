@@ -149,7 +149,7 @@ h6,
   --text-secondary: #575c82; /* Medium slate-blue text */
   --text-muted: #686d8e; /* Muted lavender-gray text (>=4.5:1 auf --bg-primary) */
   --accent-primary: #5c6494; /* Dusty lavender from the logo (darker for readability) */
-  --accent-secondary: #0d9488; /* Saturated teal/cyan from the logo stars */
+  --accent-secondary: #0f766e; /* Teal, dunkel genug fuer hellen Text auf dem Button-Verlauf (5.11:1) */
   --accent-glow: rgba(92, 100, 148, 0.2);
   --border-color: rgba(92, 100, 148, 0.15);
   --glass-border: rgba(92, 100, 148, 0.18);
@@ -431,7 +431,6 @@ main {
           --badge-glow: rgba(139, 92, 246, 0.45);
 
           .light-theme & {
-            --badge-color: #0f766e; /* Dunkleres Teal fuer >=4.5:1 */
             --badge-glow: rgba(124, 58, 237, 0.25);
           }
         }
