@@ -67,7 +67,7 @@ function updateLanguageUI() {
   const activeLangSpan = document.querySelector(".active-lang");
   if (activeLangSpan) {
     // Hier wird NUR die Flagge gesetzt, der Pfeil ist ein Geschwister-Element in header.html
-    activeLangSpan.innerHTML = `<img src="images/flags/${currentLanguage}.svg" alt="${currentLanguage}" class="flag-icon">`;
+    activeLangSpan.innerHTML = `<img src="images/flags/${currentLanguage}.svg" alt="" class="flag-icon">`;
   }
 
   const options = document.querySelectorAll(".lang-opt");
@@ -87,7 +87,7 @@ function updateLanguageUI() {
       const flagImg = document.createElement("img");
       flagImg.src = `images/flags/${lang}.svg`;
       flagImg.className = "flag-icon";
-      flagImg.alt = lang;
+      flagImg.alt = ""; // dekorativ, der Sprachname steht daneben
       htmlOpt.prepend(flagImg);
     }
   });
@@ -269,8 +269,10 @@ function setupActiveNavHighlight() {
 
     if (isHome || isExactMatch) {
       link.classList.add("active");
+      link.setAttribute("aria-current", "page");
     } else {
       link.classList.remove("active");
+      link.removeAttribute("aria-current");
     }
   });
 }
@@ -403,6 +405,15 @@ function setupPageTransitions() {
 
     if (!link || !link.href) return;
 
+    // Strg/Cmd/Umschalt/Alt- oder Mittelklick heisst "neuer Tab/Fenster":
+    // das dem Browser ueberlassen, statt im selben Tab zu navigieren.
+    if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    if (link.hasAttribute("download")) return;
+
+    // Reine "#"-Links (z. B. Cookie-Einstellungen) sind Buttons in Link-Form,
+    // keine Navigation - sonst springt die Seite nach oben.
+    if (link.getAttribute("href")?.startsWith("#")) return;
+
     const targetAttr = link.getAttribute("target");
 
     try {
@@ -522,9 +533,11 @@ function setupCookieBanner(forceShow = false) {
   const banner = document.createElement("div");
   banner.id = "cookie-banner";
   banner.className = "cookie-banner glass-card entrance-animate";
+  banner.setAttribute("role", "region");
+  banner.setAttribute("aria-labelledby", "cookie-banner-title");
   banner.innerHTML = `
         <div class="cookie-content">
-            <h3 data-i18n="cookie_title">cookie_title</h3>
+            <h3 id="cookie-banner-title" data-i18n="cookie_title">cookie_title</h3>
             <p data-i18n="cookie_text">cookie_text</p>
             <div class="cookie-links">
                 <a href="imprint.html#imprint" data-i18n="imprint_link">Impressum</a> |
@@ -537,7 +550,12 @@ function setupCookieBanner(forceShow = false) {
         </div>
     `;
 
-  document.body.appendChild(banner);
+  // Direkt hinter den Skip-Link statt ans Ende der Seite: Screenreader und
+  // Tastatur erreichen den Banner sonst erst nach dem Footer. Die Optik
+  // bleibt gleich, da er fix positioniert ist.
+  const skipLink = document.querySelector(".skip-link");
+  if (skipLink) skipLink.after(banner);
+  else document.body.prepend(banner);
   updateTexts(); // Update texts for the dynamically created banner
 
   const closeBanner = (status: "all" | "essential") => {
@@ -653,7 +671,11 @@ function setupEasterEgg() {
     document.body.appendChild(emoji);
     setTimeout(() => emoji.remove(), 9000);
   };
-  document.querySelectorAll(".easter-hint-container").forEach((el) => {
+  document.querySelectorAll<HTMLElement>(".easter-hint-container").forEach((el) => {
+    // Der Footer ueberlebt SPA-Wechsel; ohne diese Sperre kaeme pro Navigation
+    // ein weiterer Listener dazu und jeder Klick loeste ein Vielfaches aus.
+    if (el.dataset.easterBound) return;
+    el.dataset.easterBound = "true";
     el.addEventListener("click", () => {
       for (let i = 0; i < 10; i++) setTimeout(triggerEasterEgg, i * 200);
     });
