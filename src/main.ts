@@ -550,12 +550,10 @@ function setupCookieBanner(forceShow = false) {
         </div>
     `;
 
-  // Direkt hinter den Skip-Link statt ans Ende der Seite: Screenreader und
-  // Tastatur erreichen den Banner sonst erst nach dem Footer. Die Optik
-  // bleibt gleich, da er fix positioniert ist.
-  const skipLink = document.querySelector(".skip-link");
-  if (skipLink) skipLink.after(banner);
-  else document.body.prepend(banner);
+  // Muss ans Ende: der Banner ist position: sticky und belegt Platz im
+  // Seitenfluss - weiter oben eingefuegt schiebt er den Header nach unten.
+  // Als benannte Region ist er fuer Screenreader trotzdem direkt ansteuerbar.
+  document.body.appendChild(banner);
   updateTexts(); // Update texts for the dynamically created banner
 
   const closeBanner = (status: "all" | "essential") => {
