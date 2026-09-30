@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Lokales Arbeitsmaterial (z. B. Fachliteratur als EPUB).
+# Liegt beim Projekt, gehoert aber NICHT ins Repo - beide Remotes sind oeffentlich.
+_local/
