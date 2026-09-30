@@ -58,6 +58,51 @@ Everything else follows automatically: the language menu is built from the regis
 
 **Adding/changing a text:** add the key to `en.ts` first, then to every other language (the build points out where it is missing), and reference it in HTML via `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-aria-label`, `data-i18n-title` or `data-i18n-alt` (image descriptions). Purely decorative images (emotes, logos inside an already labelled link) get `alt=""` instead.
 
+### ♿ Barrierefreiheit (WCAG 2.2 AA)
+
+Die Seite wurde im September 2026 gegen WCAG 2.2 AA geprüft und korrigiert. Damit das so bleibt, gelten diese Regeln:
+
+**Farben**
+- **Niemals feste Farbwerte für Text oder Flächen.** Immer die Theme-Variablen aus `src/styles.css` nutzen. Drei der schlimmsten gefundenen Fehler kamen genau daher: Das Mobilmenü hatte `#0a0a1f` fest verdrahtet und war im Light-Theme unlesbar (1,54:1), ebenso die Partner-Beschriftung (1,26:1) und die Erfolgsmeldung im Kontaktformular (2,28:1).
+- **Mindestkontrast:** 4,5:1 für normalen Text, 3:1 ab 24px bzw. ab 18,66px fett.
+- **Verlaufs-Buttons:** Textfarbe ist `var(--bg-primary)`, nicht `#ffffff`. Weiß erreicht auf dem Akzent-Verlauf nur 2,4–3,4:1.
+- `--accent-secondary` ist im Light-Theme `#0f766e` (nicht `#0d9488`). Der hellere Ton liegt luminanzmäßig in der Mitte, dort erreicht **weder** heller **noch** dunkler Text 4,5:1.
+
+**Bilder**
+- Inhaltlich → `data-i18n-alt` mit Text in allen Sprachdateien.
+- Dekorativ (Emotes, Logos in einem Link, der schon `aria-label` hat) → `alt=""`. Sonst liest der Screenreader Dinge doppelt vor.
+
+**Interaktion**
+- Klappelemente brauchen `aria-expanded` **und** `aria-controls`, und `aria-expanded` muss in *allen* Schließpfaden gepflegt werden (Auswahl, Escape, Klick daneben).
+- Aktiver Menüpunkt bekommt `aria-current="page"`.
+- Statusmeldungen brauchen `role="status"`, sonst erfährt ein Screenreader nichts.
+- `aria-label` muss den sichtbaren Text enthalten (WCAG 2.5.3), sonst funktioniert Sprachsteuerung nicht.
+- Klickziele mindestens 24px hoch.
+- `prefers-reduced-motion` ist in `styles.css` berücksichtigt; neue Animationen dort mit abschalten.
+
+**Messfallen** (haben in der Prüfung mehrfach zu falschen Ergebnissen geführt)
+- Ein Kontrast-Skript, das `background-color` liest, **übersieht Farbverläufe** (`background-image`) und meldet Unsinn. Verlaufsstopps einzeln prüfen.
+- **Verlaufstext** (`background-clip: text` + `-webkit-text-fill-color: transparent`) macht `color` unsichtbar. Dort zählen die Verlaufsfarben, nicht `color`.
+- Der **mausgesteuerte Lichtschein** hellt Hintergründe auf. Ein Badge lag statisch bei 4,63:1 und unter dem Schein bei 4,37:1.
+- Während der Einblend-Animationen ist `opacity: 0` – Messungen erst nach ~3 Sekunden.
+- Fehler **immer im echten Browser gegenmessen**, nicht nur im CSS lesen.
+
+### 📈 Analytics & Datenschutz
+
+- **Google Analytics lädt erst nach „Alle akzeptieren"** (`initAnalytics()` in `main.ts`). Wer „Nur essenzielle" wählt, wird nicht gezählt.
+- **Zwei GA-Properties, nach Domain getrennt:** `nhywyll.com` → `G-8NZ8JX48ZP`, `test.nhywyll.com` → `G-R18WRP31XQ`. Die Auswahl macht `isProduction()` über den Hostnamen.
+- **Metricool wurde wieder entfernt** (Tracker und Datenschutz-Abschnitt).
+- **Der Twitch-Live-Status** ruft `decapi.me` auf. Das überträgt die IP der Besucher an einen Dritten und steht deshalb als Abschnitt 7 in der Datenschutzerklärung. `decapi.me` muss in der CSP unter `connect-src` stehen, sonst blockiert der Browser den Aufruf still und der Indikator zeigt dauerhaft „offline".
+- **Jede neue externe Domain** (Skript, Bild, API) braucht einen CSP-Eintrag in `src/components/head-common.html` **und** meist einen Absatz in der Datenschutzerklärung.
+
+### ⚠️ Stolpersteine
+
+- **`init()` muss am Dateiende von `main.ts` stehen.** Das Modul läuft oft schon bei `readyState === "interactive"`. Steht der Aufruf weiter oben, sind später deklarierte Konstanten noch nicht belegt, `init()` bricht ab und die Seite zeigt **nur Übersetzungsschlüssel**. Genau das ist vom 06.09. bis 15.09.2026 passiert, und zwar nur bei Besuchern mit Cookie-Zustimmung – deshalb fiel es tagelang nicht auf. Der Kommentar dazu steht im Code.
+- **Ungültige gespeicherte Sprache.** Steht in `localStorage` ein Sprachcode, den es nicht (mehr) gibt, fiel die Seite früher auf rohe Schlüssel zurück. `getInitialLanguage()` prüft den Wert jetzt und nimmt sonst die Browsersprache bzw. `DEFAULT_LANGUAGE`. Beim Entfernen einer Sprache also nicht wieder aufweichen.
+- **Der Footer überlebt Seitenwechsel.** Die SPA tauscht nur `#main-content` aus. Wer in einer pro Seite laufenden Funktion einen Listener an Footer, Header oder `document` hängt, sammelt bei jedem Wechsel einen weiteren an. Solche Listener gehören in den `isFirstLoad`-Block von `init()` oder brauchen eine Sperre (siehe `setupEasterEgg`).
+- **Der SPA-Router darf Klicks mit Strg/Cmd/Umschalt/Alt und Mittelklick nicht abfangen**, sonst ist „In neuem Tab öffnen" kaputt. Ebenso reine `#`-Links in Ruhe lassen, sonst springt die Seite nach oben.
+- **Der Cookie-Banner ist `position: sticky`, nicht `fixed`.** Er belegt Platz im Seitenfluss und muss deshalb das letzte Element im `<body>` bleiben. Weiter oben eingefügt schiebt er den Header nach unten.
+
 ### 🔍 SEO & Sitemap
 
 Each page has a dedicated `<title>` and `<meta description>` in the root HTML files. 
@@ -90,6 +135,13 @@ npm run deploy:prod
 
 _This automatically toggles the CNAME configuration and pushes to the production repository._
 
+**Wie das zusammenhängt (wichtig, sonst verwirrend):**
+
+- Es sind **zwei GitHub-Repos**: `origin` = `NhywyllTV/test_website` (Staging), `production` = `NhywyllTV/nhywyll-website` (Live). Beide bauen per GitHub Actions aus demselben Quellcode.
+- Die Domain entscheidet die Datei `public/CNAME`. Lokal steht dort immer `test.nhywyll.com`. `deploy:prod` legt einen temporären Branch an, setzt den CNAME auf `nhywyll.com`, pusht ihn per **Force** auf `production/main` und stellt lokal alles zurück. Deshalb hat `production/main` immer genau einen Commit mehr (`chore: release to production`), und deshalb funktioniert ein direkter `git push production main` nicht.
+- **Arbeitsablauf:** immer erst `git push origin main`, den Workflow abwarten, auf **test.nhywyll.com** prüfen – und erst dann `deploy:prod`. Die Testumgebung existiert genau dafür.
+- **Falle beim Prüfen:** `gh run list` direkt nach dem Push liefert oft noch den *vorherigen* Lauf. Die `headSha` gegen `git rev-parse --short HEAD` prüfen, sonst misst man den alten Stand.
+
 ---
 
 ## 🏗️ Project Structure
@@ -116,6 +168,22 @@ test_website/
 ├── imprint.html            # Legal framework
 └── 404.html                # Custom error page
 ```
+
+---
+
+## 📌 Offene Punkte (Stand 30.09.2026)
+
+Gefunden und geprüft, aber **nicht** behoben:
+
+1. **Rohe Übersetzungsschlüssel im statischen HTML.** `imprint.html` und `404.html` haben `<title>page_title_imprint</title>` bzw. `page_title_404`, dazu einige Überschriften und Texte auf index/credits. Erst JavaScript ersetzt sie. Wer kein JS ausführt – Link-Vorschauen in Discord/WhatsApp, manche Crawler – sieht „page_title_imprint". **Fix:** englischen Text als Standard ins HTML schreiben, so wie es die anderen Seiten schon machen.
+2. **Cookie-Banner überdeckt das Mobilmenü.** Banner `z-index: 10000`, Menü `var(--z-menu)` = `6000`. Solange noch keine Cookie-Auswahl getroffen wurde, verdeckt der Banner auf dem Handy den untersten Menüpunkt (WCAG 2.4.11).
+3. **Copyright-Jahr fest verdrahtet.** `&copy; 2026` in `src/components/footer.html` – ab Januar veraltet.
+4. **`<html lang="en">` steht statisch in allen Seiten.** JavaScript korrigiert es, aber vor dem Laden ist der Wert für deutsche Besucher falsch.
+5. **Meta-Beschreibungen und Open-Graph-Texte werden nicht übersetzt.** Sie sind nur englisch vorhanden; die Sprachumschaltung erfasst sie nicht.
+6. **Sprache nicht in der URL.** Es gibt keine getrennten URLs pro Sprache und kein `hreflang`. Suchmaschinen sehen nur die englische Fassung. Für mehr Sprachen irgendwann relevant.
+7. **Offene Frage:** „Mehr Sprachdateien" ist noch nicht geklärt – gemeint sein kann (a) weitere Sprachen wie `fr.ts` anlegen oder (b) die großen Dateien `de.ts`/`en.ts` pro Seite/Thema aufteilen. Für (b) müsste `src/lang/index.ts` die Teildateien zusammenführen.
+
+**Noch nicht live:** `deploy:prod` lief zuletzt am 21.09. Auf Staging, aber nicht auf nhywyll.com, liegen der i18n-Umbau (`15d2ccf`) und die übersetzten Bildbeschreibungen (`f319fa8`).
 
 ---
 
