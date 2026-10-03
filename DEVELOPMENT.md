@@ -184,7 +184,7 @@ Gefunden und geprüft, aber **nicht** behoben:
 6. **Sprache nicht in der URL.** Es gibt keine getrennten URLs pro Sprache und kein `hreflang`. Suchmaschinen sehen nur die englische Fassung. Für mehr Sprachen irgendwann relevant.
 7. **Offene Frage:** „Mehr Sprachdateien" ist noch nicht geklärt – gemeint sein kann (a) weitere Sprachen wie `fr.ts` anlegen oder (b) die großen Dateien `de.ts`/`en.ts` pro Seite/Thema aufteilen. Für (b) müsste `src/lang/index.ts` die Teildateien zusammenführen.
 
-**Noch nicht live:** `deploy:prod` lief zuletzt am 21.09. Auf Staging, aber nicht auf nhywyll.com, liegen der i18n-Umbau (`15d2ccf`) und die übersetzten Bildbeschreibungen (`f319fa8`).
+**Live-Stand (geprüft 03.10.2026):** nhywyll.com liefert den neuen Bluesky-Handle (`bsky.app/profile/nhywyll.com`), der erst am 01.10. gesetzt wurde — es lief also seitdem ein `deploy:prod`. Die frühere Notiz „noch nicht live, Stand 21.09." ist damit überholt.
 
 ---
 
