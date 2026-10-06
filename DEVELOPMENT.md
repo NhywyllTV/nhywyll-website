@@ -90,7 +90,7 @@ Die Seite wurde im September 2026 gegen WCAG 2.2 AA geprüft und korrigiert. Dam
 ### 📈 Analytics & Datenschutz
 
 - **Google Analytics lädt erst nach „Alle akzeptieren"** (`initAnalytics()` in `main.ts`). Wer „Nur essenzielle" wählt, wird nicht gezählt.
-- **Zwei GA-Properties, nach Domain getrennt:** `nhywyll.com` → `G-8NZ8JX48ZP`, `test.nhywyll.com` → `G-R18WRP31XQ`. Die Auswahl macht `isProduction()` über den Hostnamen.
+- **Zwei GA-Properties, nach Domain getrennt:** `nhywyll.com` → `G-0M4NYGENS4`, `test.nhywyll.com` → `G-R18WRP31XQ`. Die Auswahl macht `isProduction()` über den Hostnamen.
 - **Metricool wurde wieder entfernt** (Tracker und Datenschutz-Abschnitt).
 - **Der Twitch-Live-Status** ruft `decapi.me` auf. Das überträgt die IP der Besucher an einen Dritten und steht deshalb als Abschnitt 7 in der Datenschutzerklärung. `decapi.me` muss in der CSP unter `connect-src` stehen, sonst blockiert der Browser den Aufruf still und der Indikator zeigt dauerhaft „offline".
 - **Jede neue externe Domain** (Skript, Bild, API) braucht einen CSP-Eintrag in `src/components/head-common.html` **und** meist einen Absatz in der Datenschutzerklärung.
@@ -172,17 +172,24 @@ test_website/
 
 ---
 
-## 📌 Offene Punkte (Stand 30.09.2026)
+## 📌 Offene Punkte (nachgeprüft 06.10.2026)
 
-Gefunden und geprüft, aber **nicht** behoben:
+Gefunden und geprüft, aber **nicht** behoben. Alle sieben Punkte wurden am 06.10.2026 gegen den aktuellen Stand nachgemessen — alle bestehen noch, zwei sind größer als ursprünglich notiert:
 
-1. **Rohe Übersetzungsschlüssel im statischen HTML.** `imprint.html` und `404.html` haben `<title>page_title_imprint</title>` bzw. `page_title_404`, dazu einige Überschriften und Texte auf index/credits. Erst JavaScript ersetzt sie. Wer kein JS ausführt – Link-Vorschauen in Discord/WhatsApp, manche Crawler – sieht „page_title_imprint". **Fix:** englischen Text als Standard ins HTML schreiben, so wie es die anderen Seiten schon machen.
-2. **Cookie-Banner überdeckt das Mobilmenü.** Banner `z-index: 10000`, Menü `var(--z-menu)` = `6000`. Solange noch keine Cookie-Auswahl getroffen wurde, verdeckt der Banner auf dem Handy den untersten Menüpunkt (WCAG 2.4.11).
-3. **Copyright-Jahr fest verdrahtet.** `&copy; 2026` in `src/components/footer.html` – ab Januar veraltet.
-4. **`<html lang="en">` steht statisch in allen Seiten.** JavaScript korrigiert es, aber vor dem Laden ist der Wert für deutsche Besucher falsch.
-5. **Meta-Beschreibungen und Open-Graph-Texte werden nicht übersetzt.** Sie sind nur englisch vorhanden; die Sprachumschaltung erfasst sie nicht.
-6. **Sprache nicht in der URL.** Es gibt keine getrennten URLs pro Sprache und kein `hreflang`. Suchmaschinen sehen nur die englische Fassung. Für mehr Sprachen irgendwann relevant.
+1. **Rohe Übersetzungsschlüssel im statischen HTML.** Erst JavaScript ersetzt sie. Wer kein JS ausführt – Link-Vorschauen in Discord/WhatsApp, manche Crawler – sieht den Schlüssel.
+   **Nachgemessen 06.10.2026:** größer als notiert. Betroffen sind **alle sechs Seiten**, nicht nur imprint/404/index/credits: im Quelltext 33 Stellen, im Build 38 (index 21, credits 5, imprint 5, 404 3, links 3, contact 1). Finden lassen sie sich mit
+   `grep -rnoE 'data-i18n(-html)?="([a-z0-9_]+)"[^>]*>[[:space:]]*[[:space:]]*<' *.html`
+   (Fallback-Text ist identisch mit dem Schlüssel). Besonders sichtbar: `index.html:52` ist die **H1 der Startseite** (`>page_title<`), und `imprint.html`/`404.html` haben es im `<title>`. **Live bestätigt:** `curl https://nhywyll.com/imprint.html` liefert `<title data-i18n="page_title_imprint">page_title_imprint</title>` — der Build ersetzt nichts, das geht genau so an Crawler raus. **Fix:** englischen Text als Standard ins HTML schreiben, so wie contact/links/credits es im `<title>` schon machen.
+2. **Cookie-Banner überdeckt das Mobilmenü.** Banner `z-index: 10000` (hart in `.cookie-banner`), Menü `var(--z-menu)` = `6000` (WCAG 2.4.11).
+   **Im Browser nachgemessen 06.10.2026** (375×812, `localStorage` leer, Menü per echtem Klick geöffnet): Banner belegt y=463–812, die Menüpunkte liegen bei y=365–515. Ergebnis: **„Credits“ ist zu 25 von 25px verdeckt** — `elementFromPoint` auf seine Mitte trifft den Cookie-Banner, der Punkt ist also nicht anklickbar. **„Kontakt“** ist zu 10 von 25px verdeckt (Klick trifft noch den Link). Es sind also **zwei** Punkte betroffen, nicht nur der unterste.
+   **Nebenbefund:** `--z-banner: 7000` ist in `styles.css:130` deklariert, wird aber **nirgends benutzt** — `.cookie-banner` und `.skip-link` setzen beide hart `z-index: 10000` und umgehen das System. Achtung beim Fix: `var(--z-banner)` allein reicht **nicht**, denn 7000 liegt immer noch über `--z-menu` = 6000 — der Banner bliebe oben. Gewollt ist Menü > Banner, also entweder `--z-menu` über `--z-banner` heben oder den Banner ausblenden, solange das Menü offen ist.
+3. **Copyright-Jahr fest verdrahtet.** `&copy; 2026` in `src/components/footer.html:2` – ab Januar veraltet. **Bestätigt 06.10.2026**, im Browser gegengeprüft: der Footer rendert „© 2026 Nhywyll“. Nirgends ein `getFullYear()`.
+4. **`<html lang="en">` steht statisch in allen Seiten.** JavaScript korrigiert es, aber vor dem Laden ist der Wert für deutsche Besucher falsch. **Bestätigt 06.10.2026:** alle sechs HTML-Dateien haben `lang="en"` in Zeile 2; im Browser (deutsche Browsersprache, `localStorage` leer) steht nach dem JS-Lauf `lang="de"`. Die Lücke dazwischen bleibt.
+5. **Meta-Beschreibungen und Open-Graph-Texte werden nicht übersetzt.** Sie sind nur englisch vorhanden; die Sprachumschaltung erfasst sie nicht. **Bestätigt 06.10.2026:** `description`, `og:title` und `og:description` stehen als feste `content`-Attribute ohne jedes `data-i18n`. Ein Fix bräuchte einen neuen Haken (`data-i18n-content`), den das i18n-System bisher nicht kennt.
+6. **Sprache nicht in der URL.** Es gibt keine getrennten URLs pro Sprache und kein `hreflang`. Suchmaschinen sehen nur die englische Fassung. Für mehr Sprachen irgendwann relevant. **Bestätigt 06.10.2026:** `grep -rn hreflang` über alle HTML-Dateien und Komponenten findet nichts.
 7. **Offene Frage:** „Mehr Sprachdateien" ist noch nicht geklärt – gemeint sein kann (a) weitere Sprachen wie `fr.ts` anlegen oder (b) die großen Dateien `de.ts`/`en.ts` pro Seite/Thema aufteilen. Für (b) müsste `src/lang/index.ts` die Teildateien zusammenführen.
+
+**Live-Stand (geprüft 06.10.2026):** `nhywyll.com` und `test.nhywyll.com` antworten beide mit HTTP 200 und liefern `index.html` mit **identisch 12736 Byte** — exakt die Größe eines frischen lokalen Builds. Live, Staging und `main` sind also auf demselben Stand. `npm run build` läuft sauber durch, `npm run audit:i18n` meldet alle vier Checks grün.
 
 **Live-Stand (geprüft 03.10.2026):** nhywyll.com liefert den neuen Bluesky-Handle (`bsky.app/profile/nhywyll.com`), der erst am 01.10. gesetzt wurde — es lief also seitdem ein `deploy:prod`. Die frühere Notiz „noch nicht live, Stand 21.09." ist damit überholt.
 

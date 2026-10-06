@@ -620,7 +620,7 @@ document.addEventListener("click", (e) => {
 
 // Produktion und Test-Umgebung melden in getrennte Properties.
 const PROD_HOSTNAME = "nhywyll.com";
-const GA_ID_PROD = "G-8NZ8JX48ZP";
+const GA_ID_PROD = "G-0M4NYGENS4";
 const GA_ID_TEST = "G-R18WRP31XQ";
 
 const isProduction = () => window.location.hostname === PROD_HOSTNAME;
