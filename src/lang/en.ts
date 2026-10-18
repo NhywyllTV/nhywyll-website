@@ -43,7 +43,7 @@ export const en = {
   contact_type_fan: "Fan",
   partner_title: "Partners & Affiliates",
   partner_subtitle:
-    "Supporter of the channel. Buying through these links helps me directly. Thank you!",
+    "Supporters of the channel. Buying through these links helps me directly. Thank you!",
   who_i_am_text1:
     "Hi there! I'm Nhywyll, your friendly neighborhood VTuber and streamer with an unending love for all things modded Minecraft. My livestreams are a gateway to a world of limitless creativity and exhilarating adventures that this pixelated universe has to offer.",
   who_i_am_text2:

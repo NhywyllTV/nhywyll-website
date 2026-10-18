@@ -196,6 +196,7 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
+  scroll-padding-top: clamp(80px, 12vw, 140px);
 }
 
 html,
@@ -318,6 +319,11 @@ main {
   position: relative;
   z-index: 1;
   will-change: transform, opacity;
+  scroll-margin-top: clamp(80px, 12vw, 140px);
+}
+
+:target {
+  scroll-margin-top: clamp(80px, 12vw, 140px);
 }
 
 /* Hero section */
@@ -621,66 +627,6 @@ main {
       text-shadow: 0 0 20px var(--accent-glow);
     }
   }
-
-  & .about-extra {
-    background: linear-gradient(
-      135deg,
-      rgba(138, 198, 255, 0.1) 0%,
-      rgba(194, 153, 255, 0.1) 100%
-    );
-    backdrop-filter: blur(10px);
-    padding: clamp(1.5rem, 5vw, 3rem);
-    border-radius: 30px;
-    border: 1px solid var(--accent-primary);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-}
-
-
-/* Icons */
-.icon {
-  font-size: clamp(2.2rem, 6vw, 3rem);
-  margin-bottom: 1rem;
-}
-
-.social-icons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 2rem;
-}
-
-.social-icon {
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.4s ease;
-  object-fit: contain;
-
-  &:hover {
-    transform: translateY(-5px) scale(1.1);
-    filter: drop-shadow(0 0 10px var(--accent-glow));
-  }
-}
-
-.profile-image {
-  width: 350px;
-  height: 350px;
-  border-radius: 30px;
-  object-fit: cover;
-  border: 2px solid var(--accent-primary);
-  box-shadow: 0 0 30px var(--accent-glow);
-  transform: rotate(3deg);
-  transition: transform 0.5s ease;
-
-  &:hover {
-    transform: rotate(0deg) scale(1.05);
-  }
 }
 
 .smol-bean-img {
@@ -954,6 +900,10 @@ main {
   max-width: 1000px;
   margin: clamp(2rem, 5vw, 4rem) auto;
   padding: 0 2rem;
+}
+
+.imprint-card {
+  scroll-margin-top: clamp(80px, 12vw, 140px);
 }
 
 .imprint-card:focus {

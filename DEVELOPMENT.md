@@ -192,6 +192,8 @@ Gefunden und geprüft, aber **nicht** behoben. Alle sieben Punkte wurden am 06.1
 5. **Meta-Beschreibungen und Open-Graph-Texte werden nicht übersetzt.** Sie sind nur englisch vorhanden; die Sprachumschaltung erfasst sie nicht. **Bestätigt 06.10.2026:** `description`, `og:title` und `og:description` stehen als feste `content`-Attribute ohne jedes `data-i18n`. Ein Fix bräuchte einen neuen Haken (`data-i18n-content`), den das i18n-System bisher nicht kennt.
 6. **Sprache nicht in der URL.** Es gibt keine getrennten URLs pro Sprache und kein `hreflang`. Suchmaschinen sehen nur die englische Fassung. Für mehr Sprachen irgendwann relevant. **Bestätigt 06.10.2026:** `grep -rn hreflang` über alle HTML-Dateien und Komponenten findet nichts.
 7. **Offene Frage:** „Mehr Sprachdateien" ist noch nicht geklärt – gemeint sein kann (a) weitere Sprachen wie `fr.ts` anlegen oder (b) die großen Dateien `de.ts`/`en.ts` pro Seite/Thema aufteilen. Für (b) müsste `src/lang/index.ts` die Teildateien zusammenführen.
+8. **Twitter im Schema.org JSON-LD auf `index.html` (Ausdrücklich gewolltes Verhalten):**
+   Dass `https://twitter.com/nhywyll_fae` im `sameAs`-Array des JSON-LD-Blocks auf `index.html` verbleibt, obwohl Twitter/X auf `links.html` nicht mehr aktiv verlinkt wird, ist **ausdrücklich so gewollt**. Der Account ist zwar inaktiv, bleibt jedoch technisch weiterhin Teil der offiziellen Identität.
 
 **Live-Stand (geprüft 06.10.2026):** `nhywyll.com` und `test.nhywyll.com` antworten beide mit HTTP 200 und liefern `index.html` mit **identisch 12736 Byte** — exakt die Größe eines frischen lokalen Builds. Live, Staging und `main` sind also auf demselben Stand. `npm run build` läuft sauber durch, `npm run audit:i18n` meldet alle vier Checks grün.
 

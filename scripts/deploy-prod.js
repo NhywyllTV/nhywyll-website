@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { writeFileSync, readFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 
 const PROD_DOMAIN = 'nhywyll.com';
 const TEST_DOMAIN = 'test.nhywyll.com';
@@ -27,7 +27,7 @@ try {
 
     // Prüfen ob uncommittete Dateien vorliegen
     const status = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
-    const unstaged = status.split('\n').filter(line => !line.endsWith('public/CNAME') && line.trim().length > 0);
+    const unstaged = status.split('\n').filter(line => !line.trim().endsWith('public/CNAME') && line.trim().length > 0);
     if (unstaged.length > 0) {
         throw new Error(
             'Uncommittete Änderungen im Arbeitsverzeichnis gefunden!\n' +

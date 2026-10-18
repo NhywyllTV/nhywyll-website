@@ -2,7 +2,7 @@ import type { CompleteTranslation } from './i18n-types';
 
 export const de: CompleteTranslation = {
     "page_title": "Nhywyll",
-    "page_title_home": "Nhywyll - VTuber & Content Creator",
+    "page_title_home": "Nhywyll - VTuber Streamer & Content Creator",
     "page_title_social": "Soziale Links | Nhywyll",
     "page_title_contact": "Kontakt | Nhywyll",
     "page_title_credits": "Credits | Nhywyll",
