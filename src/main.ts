@@ -58,10 +58,32 @@ function initAnalytics() {
   document.head.appendChild(script2);
 }
 
+function clearAnalyticsCookies() {
+  const cookies = document.cookie.split(";");
+  const host = window.location.hostname;
+  const domains = [host, `.${host}`];
+  if (host.includes(".")) {
+    const parts = host.split(".");
+    if (parts.length > 2) {
+      domains.push(`.${parts.slice(-2).join(".")}`);
+    }
+  }
+  for (const cookie of cookies) {
+    const name = cookie.split("=")[0].trim();
+    if (name === "_ga" || name.startsWith("_ga_") || name.startsWith("_gid")) {
+      for (const domain of domains) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+      }
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+  }
+}
+
 function disableAnalytics() {
   const gaId = isProduction() ? GA_ID_PROD : GA_ID_TEST;
   (window as any)[`ga-disable-${gaId}`] = true;
-  console.log(`Analytics disabled. Property: ${gaId}`);
+  clearAnalyticsCookies();
+  console.log(`Analytics disabled and cookies cleared. Property: ${gaId}`);
 }
 
 let currentLanguage = getInitialLanguage();
@@ -217,12 +239,14 @@ function setupNavigation() {
   const menuToggle = document.getElementById("menu-toggle");
   const navUl = document.querySelector("nav ul");
 
+  const header = document.querySelector("header");
   if (!menuToggle || !navUl) return;
 
   const closeMenu = () => {
     menuToggle.setAttribute("aria-expanded", "false");
     menuToggle.classList.remove("open");
     navUl.classList.remove("open");
+    header?.classList.remove("menu-open");
   };
 
   menuToggle.addEventListener("click", (e) => {
@@ -231,6 +255,7 @@ function setupNavigation() {
     menuToggle.setAttribute("aria-expanded", (!isExpanded).toString());
     menuToggle.classList.toggle("open");
     navUl.classList.toggle("open");
+    header?.classList.toggle("menu-open", !isExpanded);
   });
 
   // Schließen beim Klick auf einen Navigationslink
@@ -848,9 +873,11 @@ function setupEasterEgg() {
     emoji.style.top = Math.floor(Math.random() * 70) + 5 + "%";
     if (Math.random() > 0.5) {
       emoji.style.left = "-80px";
+      emoji.style.right = "auto";
       emoji.style.animationName = "chicken-run";
     } else {
       emoji.style.right = "-80px";
+      emoji.style.left = "auto";
       emoji.style.animationName = "chicken-run-rtl";
     }
     document.body.appendChild(emoji);

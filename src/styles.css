@@ -162,7 +162,7 @@ h6,
   top: -50px;
   left: 1rem;
   background-color: var(--accent-primary);
-  color: white;
+  color: var(--bg-primary);
   padding: 0.5rem 1rem;
   border-radius: 6px;
   z-index: 12000;
@@ -269,6 +269,11 @@ header {
   position: sticky;
   top: 0;
   z-index: var(--z-header);
+  
+  &.menu-open,
+  &:has(nav ul.open) {
+    z-index: var(--z-menu);
+  }
   display: flex;
   justify-content: center;
   width: 100%;
@@ -436,8 +441,9 @@ main {
     z-index: 1;
 
     & .hero-image {
-      width: 320px;
-      height: 380px;
+      width: clamp(240px, 30vw, 300px);
+      height: auto;
+      aspect-ratio: 1 / 1;
       object-fit: cover;
       border-radius: 40px;
       transform: rotate(2deg);
@@ -1366,9 +1372,9 @@ nav {
       var(--accent-primary),
       var(--accent-secondary)
     );
-    color: white;
+    color: var(--bg-primary);
     border-color: var(--accent-primary);
-    box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 0 15px var(--accent-glow);
     transform: scale(1.05);
   }
 
@@ -1604,6 +1610,7 @@ footer {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
+  align-items: center;
 }
 
 .artwork-item {
@@ -1613,6 +1620,12 @@ footer {
   aspect-ratio: 16 / 9;
   border: 1px solid var(--border-color);
   transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+  display: block;
+  text-decoration: none;
+}
+
+.artwork-item.portrait {
+  aspect-ratio: 4 / 5;
 }
 
 .artwork-item img {
@@ -1620,16 +1633,19 @@ footer {
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
+  display: block;
 }
 
-.artwork-item:hover {
+.artwork-item:hover,
+.artwork-item:focus-visible {
   transform: scale(1.02);
   border-color: var(--accent-primary);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-.artwork-item:hover img {
-  transform: scale(1.1);
+.artwork-item:hover img,
+.artwork-item:focus-visible img {
+  transform: scale(1.08);
 }
 
 .artist-card-placeholder {
@@ -1898,7 +1914,6 @@ footer {
 /* --- Silkie Easter Egg --- */
 .easter-chicken {
   position: fixed;
-  left: -80px;
   z-index: 9999;
   pointer-events: none;
   user-select: none;
@@ -2084,16 +2099,26 @@ footer {
   gap: 1rem;
   margin-top: 1rem;
 }
+.artwork-mini-gallery .artwork-link {
+  display: block;
+  text-decoration: none;
+  border-radius: 8px;
+  overflow: hidden;
+}
 .artwork-mini-gallery img {
   border-radius: 8px;
   width: 100%;
   max-width: 100%;
+  height: auto;
   margin: 0;
   border: 1px solid var(--border-color);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  display: block;
 }
+.artwork-mini-gallery .artwork-link:hover img,
+.artwork-mini-gallery .artwork-link:focus-visible img,
 .artwork-mini-gallery img:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   border-color: var(--accent-primary);
 }
 
