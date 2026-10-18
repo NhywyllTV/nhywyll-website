@@ -512,6 +512,10 @@ main {
   animation-delay: 0.4s;
 }
 
+.stagger-5 {
+  animation-delay: 0.5s;
+}
+
 @keyframes fadeInUp {
   to {
     opacity: 1;
@@ -796,6 +800,24 @@ main {
 }
 
 /* Contact page styles */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 2rem;
+}
+
+.contact-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.privacy-notice {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
 .section h2 {
   margin-bottom: 0.75rem;
 }
@@ -828,6 +850,17 @@ main {
 }
 
 .form-group {
+  margin-bottom: 1.25rem;
+
+  & label,
+  & .form-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
   & input,
   & textarea,
   & select {
@@ -1734,6 +1767,11 @@ footer {
   border: none;
   width: 100%;
   text-align: left;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
   transition: background 0.3s ease;
 }
 
@@ -1746,15 +1784,10 @@ footer {
   outline-offset: 3px;
 }
 
-.faq-question,
-.faq-header h3 {
+.faq-question {
   margin: 0;
   font-size: 1.15rem;
-  color: var(--text-primary);
   font-weight: 600;
-}
-
-.faq-question {
   display: flex;
 }
 
@@ -1855,7 +1888,7 @@ footer {
   }
 
   .faq-question,
-  .faq-header h3 {
+  .faq-header {
     font-size: 1rem;
   }
 }
@@ -2351,11 +2384,21 @@ footer {
 }
 
 .live-badge {
+  --live-bg: rgba(77, 182, 172, 0.15);
+  --live-bg-hover: rgba(77, 182, 172, 0.25);
+  --live-glow: rgba(77, 182, 172, 0.25);
+
+  .light-theme & {
+    --live-bg: rgba(15, 118, 110, 0.12);
+    --live-bg-hover: rgba(15, 118, 110, 0.22);
+    --live-glow: rgba(15, 118, 110, 0.2);
+  }
+
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(77, 182, 172, 0.15); /* Light teal-mint background */
-  color: var(--accent-secondary); /* Mint-Teal from the logo */
+  background: var(--live-bg);
+  color: var(--accent-secondary);
   border: 1px solid var(--accent-secondary);
   padding: 0.25rem 0.6rem;
   border-radius: 50px;
@@ -2366,7 +2409,7 @@ footer {
   margin-left: 0.8rem;
   min-height: 24px;
   box-sizing: border-box;
-  box-shadow: 0 0 10px rgba(77, 182, 172, 0.25);
+  box-shadow: 0 0 10px var(--live-glow);
   transition: opacity 0.3s ease, transform 0.2s ease, background 0.2s ease;
   text-decoration: none;
   cursor: pointer;
@@ -2374,7 +2417,7 @@ footer {
 
   &:hover {
     transform: scale(1.05);
-    background: rgba(77, 182, 172, 0.25);
+    background: var(--live-bg-hover);
   }
 }
 

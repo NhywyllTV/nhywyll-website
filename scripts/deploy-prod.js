@@ -61,10 +61,16 @@ try {
     // 5. Zurück zum ursprünglichen Branch und Aufräumen
     console.log(`--- Räume auf und kehre zum ${startingBranch}-Stand zurück...`);
     try {
-        execSync(`git checkout ${startingBranch}`, { stdio: 'inherit' });
-        execSync(`git branch -D ${TEMP_BRANCH}`, { stdio: 'inherit' });
+        // CNAME vor dem Wechsel zurücksetzen und sicherstellen, dass uncommittete Änderungen verworfen werden
+        writeFileSync('public/CNAME', TEST_DOMAIN);
+        execSync(`git checkout -f ${startingBranch}`, { stdio: 'inherit' });
+        try {
+            execSync(`git branch -D ${TEMP_BRANCH}`, { stdio: 'ignore' });
+        } catch {
+            // Branch existierte nicht oder wurde bereits entfernt
+        }
         
-        // CNAME wieder auf Test setzen (sicherstellen, dass es lokal wieder stimmt)
+        // CNAME sicherstellen, dass lokal wieder die Test-Domain steht
         writeFileSync('public/CNAME', TEST_DOMAIN);
         console.log('✨ Alles wieder im Test-Modus.');
     } catch (cleanupError) {
