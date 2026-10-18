@@ -24,6 +24,46 @@ const getInitialLanguage = (): string => {
   return DEFAULT_LANGUAGE;
 };
 
+// Produktion und Test-Umgebung melden in getrennte Properties.
+const PROD_HOSTNAME = "nhywyll.com";
+const GA_ID_PROD = "G-0M4NYGENS4";
+const GA_ID_TEST = "G-R18WRP31XQ";
+
+const isProduction = () =>
+  window.location.hostname === PROD_HOSTNAME ||
+  window.location.hostname === `www.${PROD_HOSTNAME}`;
+
+function initAnalytics() {
+  const gaId = isProduction() ? GA_ID_PROD : GA_ID_TEST;
+  (window as any)[`ga-disable-${gaId}`] = false;
+
+  if (document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${gaId}"]`)) {
+    return;
+  }
+
+  console.log(`Analytics initialized (Consent granted). Property: ${gaId}`);
+
+  const script1 = document.createElement("script");
+  script1.async = true;
+  script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+  document.head.appendChild(script1);
+
+  const script2 = document.createElement("script");
+  script2.innerHTML = `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '${gaId}');
+    `;
+  document.head.appendChild(script2);
+}
+
+function disableAnalytics() {
+  const gaId = isProduction() ? GA_ID_PROD : GA_ID_TEST;
+  (window as any)[`ga-disable-${gaId}`] = true;
+  console.log(`Analytics disabled. Property: ${gaId}`);
+}
+
 let currentLanguage = getInitialLanguage();
 
 // Die Funktion zum Texte austauschen
@@ -87,7 +127,7 @@ function updateLanguageUI() {
   const activeLangSpan = document.querySelector(".active-lang");
   if (activeLangSpan) {
     // Hier wird NUR die Flagge gesetzt, der Pfeil ist ein Geschwister-Element in header.html
-    activeLangSpan.innerHTML = `<img src="images/flags/${currentLanguage}.svg" alt="" class="flag-icon">`;
+    activeLangSpan.innerHTML = `<img src="/images/flags/${currentLanguage}.svg" alt="" class="flag-icon">`;
   }
 
   const options = document.querySelectorAll(".lang-opt");
@@ -105,7 +145,7 @@ function updateLanguageUI() {
     // Add flag icon to option if not already present
     if (lang && !htmlOpt.querySelector(".flag-icon")) {
       const flagImg = document.createElement("img");
-      flagImg.src = `images/flags/${lang}.svg`;
+      flagImg.src = `/images/flags/${lang}.svg`;
       flagImg.className = "flag-icon";
       flagImg.alt = ""; // dekorativ, der Sprachname steht daneben
       htmlOpt.prepend(flagImg);
@@ -177,14 +217,41 @@ function setupNavigation() {
   const menuToggle = document.getElementById("menu-toggle");
   const navUl = document.querySelector("nav ul");
 
-  if (menuToggle && navUl) {
-    menuToggle.addEventListener("click", () => {
-      const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
-      menuToggle.setAttribute("aria-expanded", (!isExpanded).toString());
-      menuToggle.classList.toggle("open");
-      navUl.classList.toggle("open");
-    });
-  }
+  if (!menuToggle || !navUl) return;
+
+  const closeMenu = () => {
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.classList.remove("open");
+    navUl.classList.remove("open");
+  };
+
+  menuToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+    menuToggle.setAttribute("aria-expanded", (!isExpanded).toString());
+    menuToggle.classList.toggle("open");
+    navUl.classList.toggle("open");
+  });
+
+  // Schließen beim Klick auf einen Navigationslink
+  navUl.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
+
+  // Schließen per Escape-Taste
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && navUl.classList.contains("open")) {
+      closeMenu();
+      menuToggle.focus();
+    }
+  });
+
+  // Schließen bei Klick außerhalb des Menüs
+  document.addEventListener("click", (e) => {
+    if (navUl.classList.contains("open") && !navUl.contains(e.target as Node) && e.target !== menuToggle) {
+      closeMenu();
+    }
+  });
 }
 
 // Theme Toggle (Dark/Light Mode)
@@ -200,9 +267,20 @@ function setupTheme() {
         document.documentElement.classList.toggle("light-theme");
       const newTheme = isLightNow ? "light" : "dark";
       document.documentElement.dataset.theme = newTheme;
+      document.documentElement.style.backgroundColor = isLightNow
+        ? "#f6f7fb"
+        : "#0f101b";
       localStorage.setItem("theme", newTheme);
       themeToggle.textContent = isLightNow ? "☀️" : "🌙";
     });
+  }
+}
+
+// Dynamisches Copyright-Jahr im Footer
+function updateCopyrightYear() {
+  const yearEl = document.getElementById("copyright-year");
+  if (yearEl) {
+    yearEl.textContent = new Date().getFullYear().toString();
   }
 }
 
@@ -223,6 +301,7 @@ function init() {
 
   // Page-specific initializations
   updateTexts();
+  updateCopyrightYear();
   setupActiveNavHighlight();
   setupFAQ();
   setupEasterEgg();
@@ -287,27 +366,35 @@ function setupScrollEffects() {
   });
 }
 
+// Pfad normalisieren für robuste Vergleiche (/index.html, /index, / -> / sowie Clean URLs /contact -> /contact)
+const normalizePath = (path: string): string => {
+  let p = path.replace(/\/+$/, "");
+  if (p === "" || p === "/index" || p === "/index.html") return "/";
+  if (p.endsWith(".html")) return p.slice(0, -5);
+  return p;
+};
+
 // --- Active Nav Highlight ---
 function setupActiveNavHighlight() {
-  const currentPath = window.location.pathname;
+  const currentNorm = normalizePath(window.location.pathname);
   const navLinks = document.querySelectorAll("nav ul li a");
 
   navLinks.forEach((link) => {
     const href = link.getAttribute("href");
     if (!href) return;
 
-    // Prüfen ob der Link zur aktuellen Seite passt
-    const isHome =
-      (currentPath === "/" || currentPath.endsWith("index.html")) &&
-      href === "index.html";
-    const isExactMatch = currentPath.endsWith(href);
-
-    if (isHome || isExactMatch) {
-      link.classList.add("active");
-      link.setAttribute("aria-current", "page");
-    } else {
-      link.classList.remove("active");
-      link.removeAttribute("aria-current");
+    try {
+      const url = new URL(href, window.location.origin);
+      const targetNorm = normalizePath(url.pathname);
+      if (currentNorm === targetNorm) {
+        link.classList.add("active");
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.classList.remove("active");
+        link.removeAttribute("aria-current");
+      }
+    } catch {
+      // Ignorieren
     }
   });
 }
@@ -349,10 +436,16 @@ function setupPageTransitions() {
       // Animation starten
       mainContent.classList.add("page-exit");
 
-      // Warten bis sowohl Animation (300ms) als auch Fetch fertig sind
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      // Warten bis sowohl Animation als auch Fetch fertig sind (bei reduzierter Bewegung ohne Zwangspause)
       const [html] = await Promise.all([
         fetchPromise,
-        new Promise((resolve) => setTimeout(resolve, 300)),
+        prefersReducedMotion
+          ? Promise.resolve()
+          : new Promise((resolve) => setTimeout(resolve, 300)),
       ]);
 
       const parser = new DOMParser();
@@ -378,14 +471,75 @@ function setupPageTransitions() {
         }
         document.title = newTitle;
 
+        // Synchronize canonical and meta tags
+        const newCanonical = doc.querySelector('link[rel="canonical"]');
+        let currentCanonical = document.querySelector('link[rel="canonical"]');
+        if (newCanonical) {
+          if (!currentCanonical) {
+            currentCanonical = document.createElement("link");
+            currentCanonical.setAttribute("rel", "canonical");
+            document.head.appendChild(currentCanonical);
+          }
+          currentCanonical.setAttribute("href", newCanonical.getAttribute("href") || "");
+        } else if (currentCanonical) {
+          currentCanonical.remove();
+        }
+
+        const newDesc = doc.querySelector('meta[name="description"]');
+        const currentDesc = document.querySelector('meta[name="description"]');
+        if (newDesc && currentDesc) {
+          currentDesc.setAttribute("content", newDesc.getAttribute("content") || "");
+        }
+
+        const newRobots = doc.querySelector('meta[name="robots"]');
+        let currentRobots = document.querySelector('meta[name="robots"]');
+        if (newRobots) {
+          if (!currentRobots) {
+            currentRobots = document.createElement("meta");
+            currentRobots.setAttribute("name", "robots");
+            document.head.appendChild(currentRobots);
+          }
+          currentRobots.setAttribute("content", newRobots.getAttribute("content") || "index, follow");
+        } else if (currentRobots) {
+          currentRobots.remove();
+        }
+
+        const ogTags = ["og:title", "og:description", "og:url", "og:image"];
+        ogTags.forEach((prop) => {
+          const newOg = doc.querySelector(`meta[property="${prop}"]`);
+          let currentOg = document.querySelector(`meta[property="${prop}"]`);
+          if (newOg) {
+            if (!currentOg) {
+              currentOg = document.createElement("meta");
+              currentOg.setAttribute("property", prop);
+              document.head.appendChild(currentOg);
+            }
+            currentOg.setAttribute("content", newOg.getAttribute("content") || "");
+          } else if (currentOg) {
+            currentOg.remove();
+          }
+        });
+
         // Content tauschen
         mainContent.innerHTML = newContent.innerHTML;
         
         // Fokus setzen für Barrierefreiheit (Screenreader-Unterstützung)
         mainContent.focus();
 
-        // Re-run initializations
+        // Re-run initializations (übersetzt Texte und setzt document.title)
         init();
+
+        // Track page view in GA4 if initialized and active (jetzt mit übersetztem document.title)
+        if (typeof (window as any).gtag === "function") {
+          const gaId = isProduction() ? GA_ID_PROD : GA_ID_TEST;
+          if (!(window as any)[`ga-disable-${gaId}`]) {
+            (window as any).gtag("event", "page_view", {
+              page_title: document.title,
+              page_location: window.location.href,
+              page_path: new URL(url).pathname,
+            });
+          }
+        }
         
         // Scroll to top or anchor if hash is present
         try {
@@ -422,11 +576,23 @@ function setupPageTransitions() {
   // Prefetching bei Mouseover und Touchstart für Mobilgeräte
   const handlePrefetch = (e: Event) => {
     const link = (e.target as HTMLElement).closest("a");
-    if (link && link.href) {
+    if (!link || !link.href) return;
+    const rawHref = link.getAttribute("href");
+    if (!rawHref || rawHref.startsWith("#") || rawHref.startsWith("mailto:") || rawHref.startsWith("tel:")) return;
+
+    try {
       const url = new URL(link.href);
       if (url.origin === window.location.origin) {
-        prefetchPage(link.href);
+        // Nicht die aktuelle Seite prefetchen
+        const isCurrent =
+          url.pathname === window.location.pathname ||
+          normalizePath(url.pathname) === normalizePath(window.location.pathname);
+        if (!isCurrent) {
+          prefetchPage(link.href);
+        }
       }
+    } catch {
+      // Ignorieren falls ungültig
     }
   };
 
@@ -455,13 +621,17 @@ function setupPageTransitions() {
       const url = new URL(link.href);
 
       if (url.origin === window.location.origin && targetAttr !== "_blank") {
-        // Anker-Links auf der gleichen Seite ignorieren
-        if (url.pathname === window.location.pathname && url.hash) {
+        const currentNorm = normalizePath(window.location.pathname);
+        const targetNorm = normalizePath(url.pathname);
+        const isSamePage = currentNorm === targetNorm;
+
+        // Anker-Links auf der gleichen Seite ignorieren (Browser-natives Scrollen bzw. Hash-Sprung)
+        if (isSamePage && url.hash) {
           return;
         }
 
-        // Klick auf die aktuelle Seite -> nach oben scrollen
-        if (url.pathname === window.location.pathname && !url.hash) {
+        // Klick auf die aktuelle Seite (z. B. Logo oder "Home" wenn schon auf der Startseite) -> nach oben scrollen
+        if (isSamePage && !url.hash) {
           e.preventDefault();
           window.scrollTo({ top: 0, behavior: "smooth" });
           return;
@@ -481,72 +651,71 @@ function setupPageTransitions() {
 
 // --- Background Effects & Bird Tracks ---
 function setupEffects() {
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   // 1. Feather Particles Background
-  const particlesContainer = document.createElement("div");
-  particlesContainer.id = "particles-container";
-  document.body.prepend(particlesContainer); // Ganz nach hinten
+  if (!prefersReducedMotion) {
+    const particlesContainer = document.createElement("div");
+    particlesContainer.id = "particles-container";
+    document.body.prepend(particlesContainer); // Ganz nach hinten
 
-  const createFeather = () => {
-    const feather = document.createElement("div");
-    feather.className = "feather-particle";
+    const createFeather = () => {
+      const feather = document.createElement("div");
+      feather.className = "feather-particle";
 
-    // Zufällige Startposition, Größe und Animationsdauer
-    const startPosX = Math.random() * 100; // 0 bis 100vw
-    const size = Math.random() * 0.5 + 0.5; // 0.5 bis 1
-    const duration = Math.random() * 10 + 10; // 10s bis 20s
-    const delay = Math.random() * 5; // 0s bis 5s
+      // Zufällige Startposition, Größe und Animationsdauer
+      const startPosX = Math.random() * 100; // 0 bis 100vw
+      const size = Math.random() * 0.5 + 0.5; // 0.5 bis 1
+      const duration = Math.random() * 10 + 10; // 10s bis 20s
+      const delay = Math.random() * 5; // 0s bis 5s
 
-    feather.style.left = `${startPosX}vw`;
-    feather.style.transform = `scale(${size})`;
-    feather.style.animationDuration = `${duration}s`;
-    feather.style.animationDelay = `${delay}s`;
+      feather.style.left = `${startPosX}vw`;
+      feather.style.transform = `scale(${size})`;
+      feather.style.animationDuration = `${duration}s`;
+      feather.style.animationDelay = `${delay}s`;
 
-    particlesContainer.appendChild(feather);
+      particlesContainer.appendChild(feather);
 
-    // Entfernen, wenn die Animation durch ist, um DOM-Müll zu vermeiden
-    setTimeout(
-      () => {
-        feather.remove();
-      },
-      (duration + delay) * 1000,
-    );
-  };
+      // Entfernen, wenn die Animation durch ist, um DOM-Müll zu vermeiden
+      setTimeout(
+        () => {
+          feather.remove();
+        },
+        (duration + delay) * 1000,
+      );
+    };
 
-  // Erzeuge periodisch neue Federn
-  setInterval(createFeather, 1500); // Seltener neue Federn für bessere Performance
+    // Erzeuge periodisch neue Federn
+    setInterval(createFeather, 1500); // Seltener neue Federn für bessere Performance
 
-  // Initial weniger Federn spawnen
-  for (let i = 0; i < 8; i++) {
-    createFeather();
+    // Initial weniger Federn spawnen
+    for (let i = 0; i < 8; i++) {
+      createFeather();
+    }
   }
 
   // 2. Bird Track Click Effect
-  document.addEventListener("click", (e) => {
-    const track = document.createElement("div");
-    track.className = "bird-track";
+  if (!prefersReducedMotion) {
+    document.addEventListener("click", (e) => {
+      const track = document.createElement("div");
+      track.className = "bird-track";
 
-    // Position genau unter der Maus
-    track.style.left = `${e.clientX}px`;
-    track.style.top = `${e.clientY}px`;
+      // Position genau unter der Maus
+      track.style.left = `${e.clientX}px`;
+      track.style.top = `${e.clientY}px`;
 
-    // Leichte, zufällige Rotation für organischen Look
-    const rotation = Math.random() * 40 - 20; // -20deg bis +20deg
-    track.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(0)`;
+      // Leichte, zufällige Rotation für organischen Look
+      const rotation = Math.random() * 40 - 20; // -20deg bis +20deg
+      track.style.setProperty("--track-rot", `${rotation}deg`);
 
-    // Die Animation überschreibt transform, also nutzen wir ein Wrapper-Element für die Rotation
-    // Das bedeutet, der Wrapper rotiert, das Kind pulsiert/fadet
-    // -> Um das in CSS beizubehalten, habe ich das scale() direkt hier in TS entfernt und belasse es im CSS
+      document.body.appendChild(track);
 
-    // Besserer Fix: CSS-Variablen für die Rotation
-    track.style.setProperty("--track-rot", `${rotation}deg`);
-
-    document.body.appendChild(track);
-
-    // Element nach der Animation entfernen (0.8s)
-    setTimeout(() => {
-      track.remove();
-    }, 800);
-  });
+      // Element nach der Animation entfernen (0.8s)
+      setTimeout(() => {
+        track.remove();
+      }, 800);
+    });
+  }
 }
 
 // --- Cookie Banner & Analytics ---
@@ -575,8 +744,8 @@ function setupCookieBanner(forceShow = false) {
             <h3 id="cookie-banner-title" data-i18n="cookie_title">cookie_title</h3>
             <p data-i18n="cookie_text">cookie_text</p>
             <div class="cookie-links">
-                <a href="imprint.html#imprint" data-i18n="imprint_link">Impressum</a> |
-                <a href="imprint.html#privacy" data-i18n="privacy_link">Datenschutz</a>
+                <a href="/imprint.html#imprint" data-i18n="imprint_link">Impressum</a> |
+                <a href="/imprint.html#privacy" data-i18n="privacy_link">Datenschutz</a>
             </div>
         </div>
         <div class="cookie-buttons">
@@ -596,7 +765,11 @@ function setupCookieBanner(forceShow = false) {
     banner.style.opacity = "0";
     banner.style.transform = "translateY(90%)";
     setTimeout(() => banner.remove(), 400);
-    if (status === "all") initAnalytics();
+    if (status === "all") {
+      initAnalytics();
+    } else {
+      disableAnalytics();
+    }
   };
 
   document
@@ -618,33 +791,6 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Produktion und Test-Umgebung melden in getrennte Properties.
-const PROD_HOSTNAME = "nhywyll.com";
-const GA_ID_PROD = "G-0M4NYGENS4";
-const GA_ID_TEST = "G-R18WRP31XQ";
-
-const isProduction = () => window.location.hostname === PROD_HOSTNAME;
-
-function initAnalytics() {
-  const gaId = isProduction() ? GA_ID_PROD : GA_ID_TEST;
-  console.log(`Analytics initialized (Consent granted). Property: ${gaId}`);
-
-  // Google Analytics (GA4) Skript dynamisch einfügen
-  const script1 = document.createElement("script");
-  script1.async = true;
-  script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
-  document.head.appendChild(script1);
-
-  const script2 = document.createElement("script");
-  script2.innerHTML = `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '${gaId}');
-    `;
-  document.head.appendChild(script2);
-}
-
 // --- FAQ Accordion ---
 function setupFAQ() {
   const buttons = document.querySelectorAll<HTMLButtonElement>(".faq-header");
@@ -653,11 +799,13 @@ function setupFAQ() {
       const expanded = btn.getAttribute("aria-expanded") === "true";
       const contentId = btn.getAttribute("aria-controls");
       const content = contentId ? document.getElementById(contentId) : null;
+      const card = btn.closest(".faq-card");
 
       // Close all others first
       buttons.forEach((other) => {
         if (other !== btn) {
           other.setAttribute("aria-expanded", "false");
+          other.closest(".faq-card")?.classList.remove("active");
           const otherId = other.getAttribute("aria-controls");
           const otherContent = otherId
             ? document.getElementById(otherId)
@@ -670,13 +818,17 @@ function setupFAQ() {
       });
 
       // Toggle current
-      btn.setAttribute("aria-expanded", (!expanded).toString());
+      const willExpand = !expanded;
+      btn.setAttribute("aria-expanded", willExpand.toString());
+      if (card) {
+        card.classList.toggle("active", willExpand);
+      }
       if (content) {
         if (expanded) {
           content.style.maxHeight = "0px";
           content.style.opacity = "0";
         } else {
-          content.style.maxHeight = "300px";
+          content.style.maxHeight = `${content.scrollHeight + 32}px`;
           content.style.opacity = "1";
         }
       }
@@ -763,11 +915,8 @@ function setupContactForm() {
     successMsg.textContent =
       strings?.["contact_success"] ?? "Your mail program has been opened!";
     successMsg.style.display = "block";
-    form.reset();
-    toggleBtns.forEach((b, i) => {
-      b.classList.toggle("active", i === 0);
-      b.setAttribute("aria-pressed", String(i === 0));
-    });
+    // Formular nicht sofort leeren (form.reset()), damit eingegebener Text nicht verloren
+    // geht, falls das Betriebssystem/der Browser keinen Standard-Mail-Client konfiguriert hat.
     setTimeout(() => {
       successMsg.style.display = "none";
     }, 7000);
@@ -775,17 +924,31 @@ function setupContactForm() {
 }
 
 // --- Twitch Live Status Indicator ---
+let lastTwitchCheck = 0;
+const TWITCH_CHECK_INTERVAL = 3 * 60 * 1000; // Check at most once every 3 minutes
+
 async function checkTwitchLiveStatus() {
   const indicator = document.getElementById("live-indicator");
   if (!indicator) return;
 
+  const now = Date.now();
+  if (now - lastTwitchCheck < TWITCH_CHECK_INTERVAL) {
+    return;
+  }
+  lastTwitchCheck = now;
+
   try {
     const response = await fetch("https://decapi.me/twitch/uptime/nhywyll");
     if (response.ok) {
-      const text = await response.text();
-      // If the response is not "Channel is offline" (or translated versions), they are live!
-      const isOffline = text.toLowerCase().includes("offline");
-      if (!isOffline) {
+      const text = (await response.text()).trim();
+      const lower = text.toLowerCase();
+      // DecAPI returns "nhywyll is offline" when offline.
+      // If live, it returns formatted uptime (e.g. "1 hour, 15 minutes" or "45 minutes, 10 seconds").
+      // If rate-limited or error, it returns "[Error from Twitch API]..." or similar error strings.
+      const isError = lower.includes("error") || lower.includes("429") || lower.includes("not found");
+      const isOffline = lower.includes("offline");
+
+      if (!isError && !isOffline && text.length > 0) {
         indicator.classList.remove("hidden");
       } else {
         indicator.classList.add("hidden");

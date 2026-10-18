@@ -9,6 +9,21 @@ const TEMP_BRANCH = 'release-prod-temp';
 try {
     console.log('🚀 Starte Produktions-Deployment...');
 
+    // 0. Vorab aufräumen, falls ein früherer Lauf abbrach
+    try {
+        execSync(`git branch -D ${TEMP_BRANCH}`, { stdio: 'ignore' });
+    } catch {
+        // Branch existierte nicht, alles gut
+    }
+
+    // Prüfen ob uncommittete Dateien vorliegen
+    const status = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
+    const unstaged = status.split('\n').filter(line => !line.endsWith('public/CNAME') && line.trim().length > 0);
+    if (unstaged.length > 0) {
+        console.warn('⚠️ WARNUNG: Uncommittete Änderungen im Arbeitsverzeichnis!');
+        console.warn('Nur committete Änderungen gelangen in das Produktions-Release.');
+    }
+
     // 1. In temporären Branch wechseln
     console.log('--- Erstelle temporären Branch...');
     execSync(`git checkout -b ${TEMP_BRANCH}`, { stdio: 'inherit' });

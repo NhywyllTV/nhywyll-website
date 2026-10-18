@@ -26,6 +26,7 @@ export default defineConfig({
     injectHTML(),
     Sitemap({
       hostname: 'https://nhywyll.com/',
+      exclude: ['/404'],
       generateRobotsTxt: false,
       readable: true,
     }),

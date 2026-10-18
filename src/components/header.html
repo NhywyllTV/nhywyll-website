@@ -3,30 +3,38 @@
 >
 <header>
   <nav>
-    <a href="index.html" class="logo-link">
-      <span class="visually-hidden" data-i18n="page_title"
-        >Nhywyll - VTuber & Content Creator</span
-      >
-      <div class="logo-wrapper">
+    <div class="logo-wrapper">
+      <a href="/index.html" class="logo-link">
+        <span class="visually-hidden" data-i18n="page_title"
+          >page_title</span
+        >
         <img
-          src="images/Logo.webp"
+          src="/images/Logo.webp"
           alt=""
           class="logo"
           loading="eager"
           width="290"
           height="125"
         />
-        <span id="live-indicator" class="live-badge hidden">
-          <span class="live-pulse"></span>
-          <span class="live-text">LIVE</span>
-        </span>
-      </div>
-    </a>
+      </a>
+      <a
+        href="https://twitch.tv/nhywyll"
+        target="_blank"
+        rel="noopener noreferrer"
+        id="live-indicator"
+        class="live-badge hidden"
+        aria-label="aria_live_badge"
+        data-i18n-aria-label="aria_live_badge"
+      >
+        <span class="live-pulse" aria-hidden="true"></span>
+        <span class="live-text">LIVE</span>
+      </a>
+    </div>
     <ul id="nav-menu">
-      <li><a href="index.html" data-i18n="nav_home">Home</a></li>
-      <li><a href="links.html" data-i18n="nav_links">Links</a></li>
-      <li><a href="contact.html" data-i18n="nav_contact">Contact</a></li>
-      <li><a href="credits.html" data-i18n="nav_credits">Credits</a></li>
+      <li><a href="/index.html" data-i18n="nav_home">Home</a></li>
+      <li><a href="/links.html" data-i18n="nav_links">Links</a></li>
+      <li><a href="/contact.html" data-i18n="nav_contact">Contact</a></li>
+      <li><a href="/credits.html" data-i18n="nav_credits">Credits</a></li>
     </ul>
     <div class="nav-actions">
       <div class="language-switcher">
@@ -39,7 +47,7 @@
           aria-controls="lang-menu"
         >
           <span class="active-lang"></span>
-          <span class="dropdown-arrow">▼</span>
+          <span class="dropdown-arrow" aria-hidden="true">▼</span>
         </button>
         <div class="lang-menu" id="lang-menu">
           <!-- Optionen erzeugt main.ts aus dem Register in src/lang/index.ts -->

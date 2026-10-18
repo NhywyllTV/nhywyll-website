@@ -3,6 +3,7 @@ import type { Translation } from "./i18n-types";
 // Referenzsprache: jede andere Sprache muss genau diese Schluessel haben.
 export const en = {
   page_title: "Nhywyll",
+  page_title_home: "Nhywyll - VTuber Streamer & Content Creator",
   page_title_social: "Social Links | Nhywyll",
   page_title_contact: "Contact | Nhywyll",
   page_title_credits: "Credits | Nhywyll",
@@ -79,7 +80,7 @@ export const en = {
   partner_razer_text: "Shop Razer Gear",
   partner_humble_text: "Get Games & Support",
   page_title_404: "404 - Page Not Found | Nhywyll",
-  easter_hint: "Psst... click the chicken for a surprise! 🐔",
+  easter_hint: "Psst... click the chick for a surprise! 🐣",
   twitch: "Twitch",
   youtube: "YouTube",
   tiktok_title: "TikTok",
@@ -122,7 +123,7 @@ export const en = {
   alt_art_linked_memories: "“Water Skeb” by Linked-Memories",
   alt_art_kyandy: "Illustration by kyandy",
   contact_privacy_notice:
-    "By sending the message, you agree to the processing of your data as described in the <a href='imprint.html#privacy' class='email-link' style='font-size: 0.8rem;'>privacy policy</a>.",
+    "By sending the message, you agree to the processing of your data as described in the <a href='/imprint.html#privacy' class='email-link' style='font-size: 0.8rem;'>privacy policy</a>.",
   "404_title": "Oops! Lost in the modpacks?",
   "404_text":
     "It seems this page has been moved, deleted, or it's just hiding in a secret chicken coop.",
@@ -133,7 +134,8 @@ export const en = {
   title_theme_toggle: "Toggle between dark and light theme",
   aria_label_menu_toggle: "Toggle navigation menu",
   aria_label_back_to_top: "Back to top",
+  aria_live_badge: "Nhywyll is LIVE on Twitch! (opens in new tab)",
   cta_title: "Join the Community",
-  cta_text: "Connect with other cozy gaming &amp; Minecraft enthusiasts on Discord. Get updates, share your builds, and chat with the coop!",
+  cta_text: "Connect with other cozy gaming & Minecraft enthusiasts on Discord. Get updates, share your builds, and chat with the coop!",
   cta_button: "Join Discord",
 } satisfies Translation;

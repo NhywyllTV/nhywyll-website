@@ -2,6 +2,7 @@ import type { CompleteTranslation } from './i18n-types';
 
 export const de: CompleteTranslation = {
     "page_title": "Nhywyll",
+    "page_title_home": "Nhywyll - VTuber & Content Creator",
     "page_title_social": "Soziale Links | Nhywyll",
     "page_title_contact": "Kontakt | Nhywyll",
     "page_title_credits": "Credits | Nhywyll",
@@ -66,7 +67,7 @@ export const de: CompleteTranslation = {
     "partner_razer_text": "Razer Gear kaufen",
     "partner_humble_text": "Spiele kaufen & Gutes tun",
     "page_title_404": "404 - Seite nicht gefunden | Nhywyll",
-    "easter_hint": "Psst... klick auf das Huhn für eine Überraschung! 🐔",
+    "easter_hint": "Psst... klick auf das Küken für eine Überraschung! 🐣",
     "twitch": "Twitch",
     "youtube": "YouTube",
     "tiktok_title": "TikTok",
@@ -105,7 +106,7 @@ export const de: CompleteTranslation = {
     "alt_art_hikarumeo": "Illustration von Hikarumeo",
     "alt_art_linked_memories": "„Water Skeb“ von Linked-Memories",
     "alt_art_kyandy": "Illustration von kyandy",
-    "contact_privacy_notice": "Mit dem Absenden der Nachricht erklärst du dich mit der Verarbeitung deiner Daten gemäß der <a href='imprint.html#privacy' class='email-link' style='font-size: 0.8rem;'>Datenschutzerklärung</a> einverstanden.",
+    "contact_privacy_notice": "Mit dem Absenden der Nachricht erklärst du dich mit der Verarbeitung deiner Daten gemäß der <a href='/imprint.html#privacy' class='email-link' style='font-size: 0.8rem;'>Datenschutzerklärung</a> einverstanden.",
     "404_title": "Huch! Verirrt im Modpack?",
     "404_text": "Es scheint, als wurde diese Seite verschoben, gelöscht oder sie versteckt sich einfach in einem geheimen Hühnerstall.",
     "back_home": "Zurück in Sicherheit (Startseite)",
@@ -115,7 +116,8 @@ export const de: CompleteTranslation = {
     "title_theme_toggle": "Zwischen Dunkel- und Hellmodus wechseln",
     "aria_label_menu_toggle": "Navigationsmenü umschalten",
     "aria_label_back_to_top": "Zurück nach oben",
+    "aria_live_badge": "Nhywyll ist LIVE auf Twitch! (öffnet in neuem Tab)",
     "cta_title": "Tritt der Community bei",
-    "cta_text": "Verbinde dich mit anderen Minecraft- &amp; Gaming-Begeisterten auf Discord. Erhalte Updates, teile deine Bauwerke und quatsche mit dem Hühnerstall!",
+    "cta_text": "Verbinde dich mit anderen Minecraft- & Gaming-Begeisterten auf Discord. Erhalte Updates, teile deine Bauwerke und quatsche mit dem Hühnerstall!",
     "cta_button": "Discord beitreten"
 };

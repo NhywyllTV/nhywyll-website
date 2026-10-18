@@ -1,14 +1,14 @@
 {
-  "name": "Nhywyll | Premium VTuber Portfolio",
+  "name": "Nhywyll - VTuber Streamer & Content Creator",
   "short_name": "Nhywyll",
-  "description": "Premium Cyber-Anime themed portfolio and hub for Nhywyll's community.",
+  "description": "Official website and community hub for Nhywyll - VTuber, streamer, modded Minecraft survivalist and Silkie lover.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#050510",
-  "theme_color": "#8ac6ff",
+  "background_color": "#0f101b",
+  "theme_color": "#7d88c4",
   "icons": [
     {
-      "src": "images/For Icon.png",
+      "src": "/images/For%20Icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

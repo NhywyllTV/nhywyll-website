@@ -126,9 +126,9 @@ h6,
 
   /* Layering */
   --z-header: 5000;
-  --z-menu: 6000;
-  --z-banner: 7000;
   --z-widget: 6500;
+  --z-banner: 7000;
+  --z-menu: 11000; /* Menü überdeckt bei geöffnetem Zustand den Cookie-Banner (WCAG 2.4.11) */
 
   /* Effects (used by widgets) */
   --glass-bg: rgba(23, 25, 44, 0.7);
@@ -165,7 +165,7 @@ h6,
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  z-index: 10000;
+  z-index: 12000;
   text-decoration: none;
   font-weight: 600;
   transition:
@@ -179,36 +179,6 @@ h6,
   }
 }
 
-/* Cursor Glow */
-.cursor-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(
-    circle,
-    rgba(138, 198, 255, 0.08) 0%,
-    transparent 70%
-  );
-  border-radius: 50%;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  z-index: -1;
-  transition:
-    width 0.3s,
-    height 0.3s;
-  mix-blend-mode: screen;
-
-  .light-theme & {
-    background: radial-gradient(
-      circle,
-      rgba(30, 130, 255, 0.35) 0%,
-      transparent 70%
-    );
-    mix-blend-mode: multiply;
-  }
-}
 
 .visually-hidden {
   position: absolute;
@@ -599,7 +569,6 @@ section,
 .schedule-card,
 .stat-card,
 .artist-card,
-.card,
 .artist-card-full {
   background: var(--bg-glass);
   backdrop-filter: blur(12px);
@@ -687,105 +656,6 @@ section,
   }
 }
 
-/* Cards */
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: clamp(1rem, 3vw, 2rem);
-  margin: 4rem 0;
-}
-
-.card h3 {
-  color: var(--accent-primary);
-  margin-bottom: 1rem;
-  font-size: clamp(1.2rem, 3vw, 1.5rem);
-}
-
-.card p {
-  color: var(--text-muted);
-  line-height: 1.8;
-}
-
-.artist-section {
-  margin-top: 4rem;
-}
-
-.artist-info {
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.artist-name {
-  text-decoration: none;
-  display: inline-block;
-
-  & h3 {
-    font-size: 2.2rem;
-    color: var(--accent-primary);
-    margin-bottom: 0.5rem;
-    font-weight: 800;
-    transition: all 0.3s;
-  }
-
-  &:hover h3 {
-    text-shadow: 0 0 15px var(--accent-glow);
-    transform: scale(1.05);
-  }
-}
-
-.artist-desc {
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  max-width: 860px;
-  margin: 0 auto;
-}
-
-.artwork-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-}
-
-.artwork-item {
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-  aspect-ratio: 1 / 1;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-  & img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease;
-  }
-
-  &:hover {
-    transform: scale(1.03) translateY(-5px);
-    border-color: var(--accent-primary);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-
-    & img {
-      transform: scale(1.1);
-    }
-  }
-}
-
-.artist-card-placeholder {
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px dashed var(--glass-border);
-  padding: 4rem;
-  border-radius: 30px;
-  text-align: center;
-  color: var(--text-muted);
-  font-style: italic;
-  transition: all 0.3s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: var(--accent-primary);
-  }
-}
 
 /* Icons */
 .icon {
@@ -829,14 +699,6 @@ section,
   &:hover {
     transform: rotate(0deg) scale(1.05);
   }
-}
-
-.about-text h2 {
-  color: var(--accent-primary);
-  font-size: clamp(2.2rem, 6vw, 3rem);
-  font-weight: 800;
-  margin-bottom: 2rem;
-  text-shadow: 0 0 20px var(--accent-glow);
 }
 
 .smol-bean-img {
@@ -890,25 +752,18 @@ section,
     /* Bricht zu lange Wörter (wie 'Nhywyll') zur Not um */
   }
 
-  /* Die Bilder unter den Text schieben und verkleinern */
-  .hero-image,
-  .about-image {
+  /* Das Profilbild unter den Text schieben und verkleinern */
+  .hero-image-wrap {
     margin-top: 1.5rem;
-    width: 100% !important;
     display: flex;
     justify-content: center;
+    width: 100%;
   }
 
-  .hero-image img,
-  .about-image img {
-    max-width: 180px !important;
-    /* Bild wird kleiner, damit Platz für Text ist */
+  .hero-image {
+    max-width: 200px !important;
+    width: 100% !important;
     height: auto !important;
-  }
-
-  /* Tags (Gamer, etc.) zentrieren */
-  .tags {
-    justify-content: center !important;
   }
 
   .hero-badges {
@@ -942,7 +797,6 @@ section,
   .schedule-card,
   .stat-card,
   .artist-card,
-  .card,
   .artist-card-full {
     padding: 1.25rem !important;
     margin: 1.5rem 0 !important;
@@ -1091,16 +945,6 @@ section,
   }
 }
 
-.btn-submit {
-  background: var(--accent-primary);
-  border: none;
-  color: white;
-  padding: 0.75rem 1.4rem;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-}
-
 /* Imprint page styles */
 .imprint-container {
   max-width: 1000px;
@@ -1139,83 +983,8 @@ section,
   font-weight: 600;
 }
 
-/* === FAQ Accordion === */
-.faq-section {
-  max-width: 860px;
-  margin: 0 auto;
-}
-
 .faq-container {
   width: 100%;
-}
-
-.faq-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.faq-card {
-  border-radius: 14px;
-  overflow: hidden;
-  margin: 0 !important;
-  padding: 0 !important;
-
-  & .faq-header {
-    width: 100%;
-    background: transparent;
-    border: none;
-    padding: 1.1rem 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    text-align: left;
-    color: var(--text-primary);
-    transition: background 0.2s ease;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    & h3 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    & .faq-icon {
-      font-size: 1.4rem;
-      font-weight: 300;
-      color: var(--accent-primary);
-      flex-shrink: 0;
-      transition: transform 0.3s ease;
-      line-height: 1;
-    }
-
-    &[aria-expanded="true"] .faq-icon {
-      transform: rotate(45deg);
-    }
-  }
-
-  & .faq-content {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition:
-      max-height 0.35s ease,
-      opacity 0.25s ease;
-    padding: 0 1.5rem;
-
-    & p {
-      padding-bottom: 1.1rem;
-      margin: 0;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-  }
 }
 
 /* Links page styles */
@@ -1307,6 +1076,10 @@ section,
     font-size: 1.3rem;
     font-weight: 700;
     transition: all 0.3s ease;
+
+    .light-theme & {
+      color: var(--text-primary);
+    }
   }
 
   &:hover {
@@ -1436,16 +1209,6 @@ nav {
 
 .language-switcher.open .dropdown-arrow {
   transform: rotate(180deg);
-}
-
-.flag-icon {
-  width: 20px;
-  height: 14px;
-  object-fit: cover;
-  border-radius: 2px;
-  display: inline-block;
-  vertical-align: middle;
-  background-color: rgba(255, 255, 255, 0.1); /* Placeholder background */
 }
 
 .active-lang {
@@ -1726,18 +1489,18 @@ footer {
     justify-content: center;
     align-items: center;
     gap: clamp(1rem, 3vw, 2rem);
-    transition: right 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    visibility: hidden;
+    transition:
+      right 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
     margin: 0;
     will-change: transform;
   }
 
   nav ul.open {
+    visibility: visible;
     right: 0;
-  }
-
-  .hero h2 {
-    font-size: 2.2rem;
   }
 
   .logo {
@@ -1760,25 +1523,13 @@ footer {
   transform: scale(1.1);
 }
 
-/* Platform Specific Glows */
-.social-item[href*="twitch.tv"]:hover {
-  border-color: #a970ff;
-  box-shadow: 0 0 25px rgba(169, 112, 255, 0.4);
-}
-
-.social-item[href*="youtube.com"]:hover {
-  border-color: #ff0000;
-  box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
-}
-
-.social-item[href*="bsky.app"]:hover {
-  border-color: #0085ff;
-  box-shadow: 0 0 25px rgba(0, 133, 255, 0.4);
-}
-
 /* === START Styling für Partner/Affiliate Section === */
 
 /* Credits page styles */
+.artist-section {
+  margin-top: 4rem;
+}
+
 .artist-section h2 {
   color: var(--text-primary);
   margin-bottom: 1.5rem;
@@ -1826,10 +1577,21 @@ footer {
   text-align: left;
 }
 
+.artist-name {
+  text-decoration: none;
+  display: inline-block;
+}
+
 .artist-info h3 {
   font-size: 1.8rem;
   color: var(--accent-primary);
   margin-bottom: 0.5rem;
+  transition: all 0.3s;
+}
+
+.artist-name:hover h3 {
+  text-shadow: 0 0 15px var(--accent-glow);
+  transform: scale(1.03);
 }
 
 .artist-desc {
@@ -1880,25 +1642,6 @@ footer {
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-}
-
-.other-credits {
-  margin-top: 3rem;
-}
-
-.other-credits h2 {
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-}
-
-.other-credits ul {
-  list-style: none;
-  padding: 0;
-}
-
-.other-credits li {
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
 }
 
 /* Email links */
@@ -2116,7 +1859,7 @@ footer {
 
 .faq-card.active .faq-content {
   max-height: 500px;
-  padding: 2rem;
+  padding: 1.25rem 1.5rem;
   border-top: 1px solid var(--glass-border);
   opacity: 1;
 }
@@ -2363,7 +2106,7 @@ footer {
   margin: 0 auto;
   width: 90%;
   max-width: 800px;
-  z-index: 10000;
+  z-index: var(--z-banner);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -2647,10 +2390,18 @@ footer {
   letter-spacing: 0.05em;
   line-height: 1;
   margin-left: 0.8rem;
+  min-height: 24px;
+  box-sizing: border-box;
   box-shadow: 0 0 10px rgba(77, 182, 172, 0.25);
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.2s ease, background 0.2s ease;
+  text-decoration: none;
+  cursor: pointer;
   align-self: center;
+
+  &:hover {
+    transform: scale(1.05);
+    background: rgba(77, 182, 172, 0.25);
+  }
 }
 
 .live-badge.hidden {
@@ -2772,9 +2523,10 @@ footer {
   }
 
   /* Dekorative Dauerschleifen ganz abschalten */
-  .mesh-gradient,
-  .feather,
-  .chicken-runner,
+  body,
+  .feather-particle,
+  .easter-chicken,
+  .bird-track,
   [class*="pulse"],
   [class*="float"] {
     animation: none !important;

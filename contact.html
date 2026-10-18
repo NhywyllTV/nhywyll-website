@@ -4,53 +4,54 @@
     <load src="/src/components/head-common.html" />
     <meta name="description" content="Get in touch with Nhywyll. Contact for business inquiries, partnerships, or fan support regarding Minecraft streams and VTubing.">
     <meta name="keywords" content="contact VTuber, streamer contact, business inquiries, Nhywyll email, Minecraft collaborations">
-    <link rel="canonical" href="https://nhywyll.com/contact.html">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://nhywyll.com/contact">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://nhywyll.com/contact.html">
+    <meta property="og:url" content="https://nhywyll.com/contact">
     <meta property="og:title" content="Contact | Nhywyll">
     <meta property="og:description" content="Get in touch with Nhywyll for business or fan inquiries.">
     <meta property="og:image" content="https://nhywyll.com/images/Logo.webp">
 
-    <title data-i18n="page_title_contact">Contact | Nhywyll</title>
+    <title data-i18n="page_title_contact">page_title_contact</title>
 </head>
 <body>
     <load src="/src/components/header.html" />
     <main id="main-content" tabindex="-1">
     <div class="container entrance-animate">
-        <h1 class="hero-title stagger-1" data-i18n="contact_title">Contact & Collaboration</h1>
+        <h1 class="hero-title stagger-1" data-i18n="contact_title">contact_title</h1>
         
-        <div class="contact-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <div class="contact-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 2rem;">
             <div class="contact-methods">
                 <div class="section">
-                    <h2 data-i18n="contact_business_title">Business & Partnership</h2>
-                    <p class="contact-item" data-i18n-html="contact_business_email">Email: <a href="mailto:contact@nhywyll.com" class="email-link">contact@nhywyll.com</a></p>
-                    <p class="contact-item" data-i18n="contact_business_text">Branding requests, sponsorships, and creative collabs are welcomed.</p>
+                    <h2 data-i18n="contact_business_title">contact_business_title</h2>
+                    <p class="contact-item" data-i18n-html="contact_business_email">contact_business_email</p>
+                    <p class="contact-item" data-i18n="contact_business_text">contact_business_text</p>
                 </div>
                 <div class="section">
                     <div class="title-with-emote">
-                        <img src="images/Emotes/chu.webp" alt="" class="inline-emote">
-                        <h2 data-i18n="contact_fan_title" style="margin-bottom:0;">Fan & Stream Support</h2>
+                        <img src="/images/Emotes/chu.webp" alt="" class="inline-emote" width="60" height="60" loading="lazy">
+                        <h2 data-i18n="contact_fan_title" style="margin-bottom:0;">contact_fan_title</h2>
                     </div>
-                    <p class="contact-item" data-i18n-html="contact_fan_email">Email: <a href="mailto:fan@nhywyll.com" class="email-link">fan@nhywyll.com</a></p>
-                    <p class="contact-item" data-i18n="contact_fan_text">Questions about schedule, song requests, or community events.</p>
+                    <p class="contact-item" data-i18n-html="contact_fan_email">contact_fan_email</p>
+                    <p class="contact-item" data-i18n="contact_fan_text">contact_fan_text</p>
                 </div>
             </div>
             <div class="section">
-                <h2 data-i18n="contact_quick_title">Quick Message</h2>
+                <h2 data-i18n="contact_quick_title">contact_quick_title</h2>
                 <form id="contact-form" class="contact-form">
-                    <div class="form-group"><label for="name" data-i18n="contact_label_name">Name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" data-i18n-placeholder="contact_placeholder_name" required></div>
+                    <div class="form-group"><label for="name" data-i18n="contact_label_name">contact_label_name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="contact_placeholder_name" data-i18n-placeholder="contact_placeholder_name" required></div>
                     <div class="form-group">
-                        <span class="form-label" id="inquiry-type-label" data-i18n="contact_label_type">Inquiry type</span>
+                        <span class="form-label" id="inquiry-type-label" data-i18n="contact_label_type">contact_label_type</span>
                         <div class="toggle-group" role="group" aria-labelledby="inquiry-type-label">
-                            <button type="button" class="toggle-btn active" data-value="business" aria-pressed="true" data-i18n="contact_type_business">Business &amp; Partnership</button>
-                            <button type="button" class="toggle-btn" data-value="fan" aria-pressed="false" data-i18n="contact_type_fan">Fan &amp; Community</button>
+                            <button type="button" class="toggle-btn active" data-value="business" aria-pressed="true" data-i18n="contact_type_business">contact_type_business</button>
+                            <button type="button" class="toggle-btn" data-value="fan" aria-pressed="false" data-i18n="contact_type_fan">contact_type_fan</button>
                         </div>
                     </div>
-                    <div class="form-group"><label for="message" data-i18n="contact_label_message">Message</label><textarea id="message" name="message" placeholder="How can Nhywyll help?" data-i18n-placeholder="contact_placeholder_message" required></textarea></div>
-                    <p class="privacy-notice" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;" data-i18n-html="contact_privacy_notice">By sending the message, you agree to the processing of your data as described in the privacy policy.</p>
-                    <button type="submit" class="btn-animated-border" data-i18n="contact_button">Send Message</button>
+                    <div class="form-group"><label for="message" data-i18n="contact_label_message">contact_label_message</label><textarea id="message" name="message" placeholder="contact_placeholder_message" data-i18n-placeholder="contact_placeholder_message" required></textarea></div>
+                    <p class="privacy-notice" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;" data-i18n-html="contact_privacy_notice">contact_privacy_notice</p>
+                    <button type="submit" class="btn-animated-border" data-i18n="contact_button">contact_button</button>
                 </form>
             </div>
         </div>
