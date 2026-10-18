@@ -140,7 +140,7 @@ _This automatically toggles the CNAME configuration and pushes to the production
 - Es sind **zwei GitHub-Repos**: `origin` = `NhywyllTV/test_website` (Staging), `production` = `NhywyllTV/nhywyll-website` (Live). Beide bauen per GitHub Actions aus demselben Quellcode.
 - Die Domain entscheidet die Datei `public/CNAME`. Lokal steht dort immer `test.nhywyll.com`. `deploy:prod` legt einen temporären Branch an, setzt den CNAME auf `nhywyll.com`, pusht ihn per **Force** auf `production/main` und stellt lokal alles zurück. Deshalb hat `production/main` immer genau einen Commit mehr (`chore: release to production`), und deshalb funktioniert ein direkter `git push production main` nicht.
 - **Arbeitsablauf:** immer erst `git push origin main`, den Workflow abwarten, auf **test.nhywyll.com** prüfen – und erst dann `deploy:prod`. Die Testumgebung existiert genau dafür.
-- **`deploy:prod` committet nur `public/CNAME` – sonst nichts.** Inhaltsänderungen müssen vorher committet sein. Uncommittete Dateien nimmt `git checkout -b` zwar ins Arbeitsverzeichnis des temporären Branches mit, in den Release-Commit kommen sie aber nicht. Das Skript meldet trotzdem fröhlich „✅ Deployment erfolgreich abgeschlossen!", und live ändert sich nichts – es gibt keine Warnung. Aufgefallen am 01.10.2026 beim Wechsel des Bluesky-Handles. Also vor jedem `deploy:prod` ein `git status` – das Arbeitsverzeichnis muss sauber sein.
+- **`deploy:prod` committet nur `public/CNAME` – sonst nichts.** Inhaltsänderungen müssen vorher committet sein. Das Skript bricht seit Oktober 2026 automatisch mit einer Fehlermeldung ab, falls uncommittete Änderungen im Arbeitsverzeichnis gefunden werden, damit keine unfertigen Stände verloren gehen oder unveröffentlicht bleiben. Zudem kehrt das Skript bei Erfolg oder Abbruch garantiert zum Ausgangs-Branch zurück.
 - **Falle beim Prüfen:** `gh run list` direkt nach dem Push liefert oft noch den *vorherigen* Lauf. Die `headSha` gegen `git rev-parse --short HEAD` prüfen, sonst misst man den alten Stand.
 
 ---
@@ -149,19 +149,21 @@ _This automatically toggles the CNAME configuration and pushes to the production
 
 ```text
 test_website/
-├── scripts/                # Deployment Automation
+├── scripts/                # Deployment Automation & i18n Audits
 ├── public/                 # Static assets (images, logos, icons, fonts)
 │   ├── images/
 │   │   ├── Emotes/           # Live stream emotes
 │   │   ├── media/            # Social media icons
 │   │   └── artwork-library/  # Curated artist showcase and commissions
 │   ├── fonts/              # Local typography (Outfit)
-│   ├── sitemap.xml         # SEO engine optimization
+│   ├── manifest.json       # Web App Manifest
+│   ├── CNAME               # Domain configuration (test vs prod)
 │   └── robots.txt          # Crawler instructions
 ├── src/                    # Source files for build
 │   ├── main.ts               # Core logic: i18n, Transitions, Effects & UI
 │   ├── styles.css            # Global style themes and variables
 │   └── lang/                 # Translations (en.ts = reference, de.ts) + registry in index.ts
+├── dist/                   # Build output (sitemap.xml is generated here automatically)
 ├── index.html              # Hero, About & FAQ
 ├── links.html              # Social hub
 ├── contact.html            # Business center

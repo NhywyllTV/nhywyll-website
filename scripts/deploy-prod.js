@@ -6,8 +6,17 @@ const TEST_DOMAIN = 'test.nhywyll.com';
 const REMOTE_NAME = 'production';
 const TEMP_BRANCH = 'release-prod-temp';
 
+let startingBranch = 'main';
+
 try {
     console.log('🚀 Starte Produktions-Deployment...');
+
+    // Aktuellen Branch ermitteln, um nach dem Deployment exakt dorthin zurückzukehren
+    try {
+        startingBranch = execSync('git branch --show-current', { encoding: 'utf-8' }).trim() || 'main';
+    } catch {
+        startingBranch = 'main';
+    }
 
     // 0. Vorab aufräumen, falls ein früherer Lauf abbrach
     try {
@@ -20,8 +29,11 @@ try {
     const status = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
     const unstaged = status.split('\n').filter(line => !line.endsWith('public/CNAME') && line.trim().length > 0);
     if (unstaged.length > 0) {
-        console.warn('⚠️ WARNUNG: Uncommittete Änderungen im Arbeitsverzeichnis!');
-        console.warn('Nur committete Änderungen gelangen in das Produktions-Release.');
+        throw new Error(
+            'Uncommittete Änderungen im Arbeitsverzeichnis gefunden!\n' +
+            'Nur committete Änderungen gelangen in das Produktions-Release.\n' +
+            'Bitte committe oder stashe deine Änderungen zuerst.'
+        );
     }
 
     // 1. In temporären Branch wechseln
@@ -44,11 +56,12 @@ try {
     console.log('✅ Deployment erfolgreich abgeschlossen!');
 } catch (error) {
     console.error('❌ Fehler beim Deployment:', error.message);
+    process.exitCode = 1;
 } finally {
-    // 5. Zurück zum Haupt-Branch und Aufräumen
-    console.log('--- Räume auf und kehre zum Test-Stand zurück...');
+    // 5. Zurück zum ursprünglichen Branch und Aufräumen
+    console.log(`--- Räume auf und kehre zum ${startingBranch}-Stand zurück...`);
     try {
-        execSync('git checkout main', { stdio: 'inherit' });
+        execSync(`git checkout ${startingBranch}`, { stdio: 'inherit' });
         execSync(`git branch -D ${TEMP_BRANCH}`, { stdio: 'inherit' });
         
         // CNAME wieder auf Test setzen (sicherstellen, dass es lokal wieder stimmt)

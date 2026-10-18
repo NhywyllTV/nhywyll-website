@@ -160,8 +160,10 @@ function updateLanguageUI() {
     // Update selection state
     if (lang === currentLanguage) {
       htmlOpt.classList.add("active");
+      htmlOpt.setAttribute("aria-current", "true");
     } else {
       htmlOpt.classList.remove("active");
+      htmlOpt.removeAttribute("aria-current");
     }
 
     // Add flag icon to option if not already present
@@ -314,6 +316,9 @@ let isFirstLoad = true;
 
 function init() {
   if (isFirstLoad) {
+    if (!history.state) {
+      history.replaceState({ url: window.location.href }, "", window.location.href);
+    }
     setupPageTransitions();
     setupEffects();
     setupNavigation();
@@ -432,27 +437,29 @@ function setupPageTransitions() {
   if (!mainContent) return;
 
   const prefetchPage = async (url: string) => {
-    if (pageCache.has(url)) return;
+    const cleanUrl = url.split("#")[0];
+    if (pageCache.has(cleanUrl)) return;
     try {
-      const response = await fetch(url);
+      const response = await fetch(cleanUrl);
       if (response.ok) {
         const html = await response.text();
-        pageCache.set(url, html);
+        pageCache.set(cleanUrl, html);
       }
     } catch (err) {
-      console.warn("Prefetch failed for:", url);
+      console.warn("Prefetch failed for:", cleanUrl);
     }
   };
 
   const loadPage = async (url: string, pushState = true) => {
+    const cleanUrl = url.split("#")[0];
     // Starte den Fetch sofort parallel zur Animation
     const fetchPromise = (async () => {
-      let html = pageCache.get(url);
+      let html = pageCache.get(cleanUrl);
       if (!html) {
-        const response = await fetch(url);
+        const response = await fetch(cleanUrl);
         if (!response.ok) throw new Error("Network response was not ok");
         html = await response.text();
-        pageCache.set(url, html);
+        pageCache.set(cleanUrl, html);
       }
       return html;
     })();
@@ -685,6 +692,7 @@ function setupEffects() {
     document.body.prepend(particlesContainer); // Ganz nach hinten
 
     const createFeather = () => {
+      if (document.hidden) return;
       const feather = document.createElement("div");
       feather.className = "feather-particle";
 
@@ -769,8 +777,8 @@ function setupCookieBanner(forceShow = false) {
             <h3 id="cookie-banner-title" data-i18n="cookie_title">cookie_title</h3>
             <p data-i18n="cookie_text">cookie_text</p>
             <div class="cookie-links">
-                <a href="/imprint.html#imprint" data-i18n="imprint_link">Impressum</a> |
-                <a href="/imprint.html#privacy" data-i18n="privacy_link">Datenschutz</a>
+                <a href="/imprint#imprint" data-i18n="imprint_link">Impressum</a> |
+                <a href="/imprint#privacy" data-i18n="privacy_link">Datenschutz</a>
             </div>
         </div>
         <div class="cookie-buttons">
