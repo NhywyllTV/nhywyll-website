@@ -375,10 +375,6 @@ main {
           background: var(--badge-color);
           color: var(--bg-primary);
           box-shadow: 0 0 20px var(--badge-glow);
-          
-          .light-theme & {
-            color: #ffffff;
-          }
         }
 
         &:nth-child(1) {
@@ -580,7 +576,7 @@ main {
 
   & h2 {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 0.75rem;
     font-size: clamp(1.8rem, 5vw, 2.5rem);
     background: linear-gradient(
       135deg,
@@ -764,35 +760,9 @@ main {
   margin-bottom: 1rem;
 }
 
-.section h2 {
-  margin-bottom: 0.75rem;
-}
-
 .contact-item {
   margin-bottom: 0.75rem;
   color: var(--text-secondary);
-}
-
-.contact-form {
-  & input,
-  & textarea {
-    width: 100%;
-    padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: 15px;
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-
-    &:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.08);
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 15px var(--accent-glow);
-    }
-  }
 }
 
 .form-group {
@@ -1448,20 +1418,12 @@ footer {
     visibility: visible;
     right: 0;
   }
-
-  .logo {
-    height: 80px;
-  }
 }
 
 /* Styling für die Social Icons in den Karten */
 .social-icon {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 1.5rem auto;
   display: block;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-  transition: transform 0.3s ease;
   object-fit: contain;
 }
 
@@ -1637,7 +1599,8 @@ footer {
   justify-content: center;
 
   &:hover {
-    background: rgba(102, 126, 234, 0.1);
+    background: var(--bg-glass);
+    box-shadow: 0 10px 25px var(--accent-glow);
     transform: translateY(-5px);
     border-color: var(--accent-primary);
 
@@ -1947,16 +1910,29 @@ footer {
 
 .easter-hint-container {
   opacity: 0.15;
-  cursor: help;
+  cursor: pointer;
   transition: opacity 0.3s ease;
   position: relative;
   display: inline-block;
   margin-left: 0.5rem;
   font-size: 1.1rem;
+  background: transparent;
+  border: none;
+  padding: 0.25rem;
+  min-height: 24px;
+  font-family: inherit;
+  color: inherit;
+  vertical-align: middle;
 }
 
-.easter-hint-container:hover {
+.easter-hint-container:hover,
+.easter-hint-container:focus-visible {
   opacity: 1;
+}
+
+.easter-hint-container:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  border-radius: 6px;
 }
 
 .easter-tooltip {
@@ -1976,9 +1952,11 @@ footer {
   color: var(--text-primary);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   z-index: 100;
+  pointer-events: none;
 }
 
-.easter-hint-container:hover .easter-tooltip {
+.easter-hint-container:hover .easter-tooltip,
+.easter-hint-container:focus-visible .easter-tooltip {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
@@ -2172,20 +2150,20 @@ footer {
 
 @keyframes float-feather {
   0% {
-    transform: translateY(-5vh) translateX(0) rotate(0deg);
+    transform: translateY(-5vh) translateX(0) rotate(0deg) scale(var(--feather-scale, 1));
     opacity: 0;
   }
   10% {
     opacity: 0.6;
   }
   50% {
-    transform: translateY(50vh) translateX(30px) rotate(45deg);
+    transform: translateY(50vh) translateX(30px) rotate(45deg) scale(var(--feather-scale, 1));
   }
   90% {
     opacity: 0.6;
   }
   100% {
-    transform: translateY(105vh) translateX(-20px) rotate(90deg);
+    transform: translateY(105vh) translateX(-20px) rotate(90deg) scale(var(--feather-scale, 1));
     opacity: 0;
   }
 }
@@ -2195,7 +2173,7 @@ footer {
   position: fixed;
   width: 24px;
   height: 24px;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23c299ff"><path d="M11 20v-5.5l-4-3 .8-.6 3.2 2.6V7h2v6.5l3.2-2.6.8.6-4 3V20h-2zM9 4.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%237d88c4"><path d="M11 20v-5.5l-4-3 .8-.6 3.2 2.6V7h2v6.5l3.2-2.6.8.6-4 3V20h-2zM9 4.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"/></svg>');
   background-size: contain;
   pointer-events: none;
   transform: translate(-50%, -50%) rotate(var(--track-rot, 0deg)) scale(0);
@@ -2203,6 +2181,10 @@ footer {
   opacity: 0;
   animation: track-fade 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
   filter: drop-shadow(0 0 5px var(--accent-glow));
+
+  .light-theme & {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235c6494"><path d="M11 20v-5.5l-4-3 .8-.6 3.2 2.6V7h2v6.5l3.2-2.6.8.6-4 3V20h-2zM9 4.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"/></svg>');
+  }
 }
 
 @keyframes track-fade {

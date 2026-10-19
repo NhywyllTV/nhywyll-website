@@ -1,6 +1,6 @@
 # 🛠️ Development & Maintenance Guide
 
-This document contains everything you need to know about developing, building, and maintaining \*The Vtuber's Website\*\*.
+This document contains everything you need to know about developing, building, and maintaining **The Vtuber's Website**.
 
 ---
 

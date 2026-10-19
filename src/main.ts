@@ -431,35 +431,54 @@ function setupActiveNavHighlight() {
 
 // --- Smooth Page Transitions (SPA) ---
 const pageCache = new Map<string, string>();
+let currentLoadId = 0;
+
+const getCacheKey = (urlStr: string): string => {
+  try {
+    const u = new URL(urlStr, window.location.origin);
+    return normalizePath(u.pathname);
+  } catch {
+    return urlStr.split("#")[0];
+  }
+};
 
 function setupPageTransitions() {
   const mainContent = document.getElementById("main-content");
   if (!mainContent) return;
 
+  // Initial geladene Seite direkt im Cache ablegen, damit "Zurück" keinen erneuten Fetch braucht
+  const initialKey = getCacheKey(window.location.href);
+  if (!pageCache.has(initialKey)) {
+    pageCache.set(initialKey, document.documentElement.outerHTML);
+  }
+
   const prefetchPage = async (url: string) => {
-    const cleanUrl = url.split("#")[0];
-    if (pageCache.has(cleanUrl)) return;
+    const cacheKey = getCacheKey(url);
+    if (pageCache.has(cacheKey)) return;
     try {
-      const response = await fetch(cleanUrl);
+      const response = await fetch(url.split("#")[0]);
       if (response.ok) {
         const html = await response.text();
-        pageCache.set(cleanUrl, html);
+        pageCache.set(cacheKey, html);
       }
     } catch (err) {
-      console.warn("Prefetch failed for:", cleanUrl);
+      console.warn("Prefetch failed for:", url);
     }
   };
 
   const loadPage = async (url: string, pushState = true) => {
-    const cleanUrl = url.split("#")[0];
+    const loadId = ++currentLoadId;
+    const cacheKey = getCacheKey(url);
+    const fetchUrl = url.split("#")[0];
+
     // Starte den Fetch sofort parallel zur Animation
     const fetchPromise = (async () => {
-      let html = pageCache.get(cleanUrl);
+      let html = pageCache.get(cacheKey);
       if (!html) {
-        const response = await fetch(cleanUrl);
+        const response = await fetch(fetchUrl);
         if (!response.ok) throw new Error("Network response was not ok");
         html = await response.text();
-        pageCache.set(cleanUrl, html);
+        pageCache.set(cacheKey, html);
       }
       return html;
     })();
@@ -479,6 +498,9 @@ function setupPageTransitions() {
           ? Promise.resolve()
           : new Promise((resolve) => setTimeout(resolve, 300)),
       ]);
+
+      // Abbrechen, falls währenddessen bereits eine neuere Navigation gestartet wurde
+      if (loadId !== currentLoadId) return;
 
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
@@ -554,9 +576,6 @@ function setupPageTransitions() {
 
         // Content tauschen
         mainContent.innerHTML = newContent.innerHTML;
-        
-        // Fokus setzen für Barrierefreiheit (Screenreader-Unterstützung)
-        mainContent.focus();
 
         // Re-run initializations (übersetzt Texte und setzt document.title)
         init();
@@ -568,33 +587,35 @@ function setupPageTransitions() {
             (window as any).gtag("event", "page_view", {
               page_title: document.title,
               page_location: window.location.href,
-              page_path: new URL(url).pathname,
+              page_path: new URL(url, window.location.origin).pathname,
             });
           }
         }
         
-        // Scroll to top or anchor if hash is present
+        // Scroll to top or anchor if hash is present, and set focus once for accessibility
         try {
-          const parsedUrl = new URL(url);
-          if (parsedUrl.hash) {
-            const targetEl = document.querySelector(parsedUrl.hash);
-            if (targetEl) {
-              targetEl.scrollIntoView({ behavior: "instant" as ScrollBehavior });
-              // Set focus for accessibility
-              if (targetEl instanceof HTMLElement) {
-                targetEl.focus();
-              }
+          const parsedUrl = new URL(url, window.location.origin);
+          const targetEl = parsedUrl.hash
+            ? document.querySelector(parsedUrl.hash)
+            : null;
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "instant" as ScrollBehavior });
+            if (targetEl instanceof HTMLElement) {
+              targetEl.focus({ preventScroll: true });
             } else {
-              window.scrollTo(0, 0);
+              mainContent.focus({ preventScroll: true });
             }
           } else {
             window.scrollTo(0, 0);
+            mainContent.focus({ preventScroll: true });
           }
-        } catch (e) {
+        } catch {
           window.scrollTo(0, 0);
+          mainContent.focus({ preventScroll: true });
         }
       }
     } catch (error) {
+      if (loadId !== currentLoadId) return;
       console.error("Failed to load page via SPA:", error);
       window.location.href = url; // Fallback
     }
@@ -617,7 +638,6 @@ function setupPageTransitions() {
       if (url.origin === window.location.origin) {
         // Nicht die aktuelle Seite prefetchen
         const isCurrent =
-          url.pathname === window.location.pathname ||
           normalizePath(url.pathname) === normalizePath(window.location.pathname);
         if (!isCurrent) {
           prefetchPage(link.href);
@@ -643,9 +663,9 @@ function setupPageTransitions() {
     if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     if (link.hasAttribute("download")) return;
 
-    // Reine "#"-Links (z. B. Cookie-Einstellungen) sind Buttons in Link-Form,
-    // keine Navigation - sonst springt die Seite nach oben.
-    if (link.getAttribute("href")?.startsWith("#")) return;
+    const rawHref = link.getAttribute("href");
+    // Reine "#"-Links (z. B. Cookie-Einstellungen) sowie mailto:/tel: ignorieren
+    if (!rawHref || rawHref.startsWith("#") || rawHref.startsWith("mailto:") || rawHref.startsWith("tel:")) return;
 
     const targetAttr = link.getAttribute("target");
 
@@ -668,9 +688,6 @@ function setupPageTransitions() {
           window.scrollTo({ top: 0, behavior: "smooth" });
           return;
         }
-
-        if (link.getAttribute("href")?.startsWith("mailto:")) return;
-        if (link.getAttribute("href")?.startsWith("tel:")) return;
 
         e.preventDefault();
         loadPage(link.href);
@@ -703,7 +720,7 @@ function setupEffects() {
       const delay = Math.random() * 5; // 0s bis 5s
 
       feather.style.left = `${startPosX}vw`;
-      feather.style.transform = `scale(${size})`;
+      feather.style.setProperty("--feather-scale", `${size}`);
       feather.style.animationDuration = `${duration}s`;
       feather.style.animationDelay = `${delay}s`;
 
@@ -830,8 +847,6 @@ function setupFAQ() {
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const expanded = btn.getAttribute("aria-expanded") === "true";
-      const contentId = btn.getAttribute("aria-controls");
-      const content = contentId ? document.getElementById(contentId) : null;
       const card = btn.closest(".faq-card");
 
       // Close all others first
@@ -839,31 +854,14 @@ function setupFAQ() {
         if (other !== btn) {
           other.setAttribute("aria-expanded", "false");
           other.closest(".faq-card")?.classList.remove("active");
-          const otherId = other.getAttribute("aria-controls");
-          const otherContent = otherId
-            ? document.getElementById(otherId)
-            : null;
-          if (otherContent) {
-            otherContent.style.maxHeight = "0px";
-            otherContent.style.opacity = "0";
-          }
         }
       });
 
-      // Toggle current
+      // Toggle current (CSS regelt die Öffnungs-/Schließhöhe dynamisch über .faq-card.active)
       const willExpand = !expanded;
       btn.setAttribute("aria-expanded", willExpand.toString());
       if (card) {
         card.classList.toggle("active", willExpand);
-      }
-      if (content) {
-        if (expanded) {
-          content.style.maxHeight = "0px";
-          content.style.opacity = "0";
-        } else {
-          content.style.maxHeight = `${content.scrollHeight + 32}px`;
-          content.style.opacity = "1";
-        }
       }
     });
   });
@@ -873,8 +871,10 @@ function setupFAQ() {
 function setupEasterEgg() {
   const chickenEmojis = ["🐔", "🐣", "🐥", "🐤", "🦆", "🐧", "🐓", "🦅"];
   const triggerEasterEgg = () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const emoji = document.createElement("span");
     emoji.className = "easter-chicken";
+    emoji.setAttribute("aria-hidden", "true");
     emoji.textContent =
       chickenEmojis[Math.floor(Math.random() * chickenEmojis.length)];
     emoji.style.fontSize = Math.floor(Math.random() * 24) + 28 + "px";
