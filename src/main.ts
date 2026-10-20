@@ -580,18 +580,9 @@ function setupPageTransitions() {
         // Re-run initializations (übersetzt Texte und setzt document.title)
         init();
 
-        // Track page view in GA4 if initialized and active (jetzt mit übersetztem document.title)
-        if (typeof (window as any).gtag === "function") {
-          const gaId = isProduction() ? GA_ID_PROD : GA_ID_TEST;
-          if (!(window as any)[`ga-disable-${gaId}`]) {
-            (window as any).gtag("event", "page_view", {
-              page_title: document.title,
-              page_location: window.location.href,
-              page_path: new URL(url, window.location.origin).pathname,
-            });
-          }
-        }
-        
+        // Kein eigenes page_view: GA4 zählt Seitenwechsel per pushState selbst
+        // (Erweiterte Messung, Browserverlaufsereignisse). Ein zweites zählte doppelt.
+
         // Scroll to top or anchor if hash is present, and set focus once for accessibility
         try {
           const parsedUrl = new URL(url, window.location.origin);
